@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entriqs – Organizer</title>
+
+<script>
+  window.PAGE_MODE = "protected";
+  // Page-level declaration
+  window.REQUIRED_ROLE = "organizer";
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<!-- QR Code Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<style>
+  .event-type-option {
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgb(161 161 170); /* zinc-400 */
+    background: rgba(24,24,27,0.4); /* zinc-900/40 */
+    transition: all 0.2s ease;
+  }
+
+  .event-type-option:hover {
+    color: white;
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  .event-type-option.selected {
+    color: white;
+    background: rgb(39 39 42); /* zinc-800 */
+    border-color: white;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.6),
+      0 0 0 2px rgba(255,255,255,0.3);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* For Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  /* Canvas Grid */
+  .canvas-grid {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Draggable Items */
+  .draggable-item {
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .draggable-item:active {
+    cursor: grabbing;
+    transform: scale(1.02);
+    z-index: 50;
+  }
+
+  .draggable-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  /* Custom Color Input */
+  input[type="color"] {
+    appearance: none;
+    -webkit-appearance: none; /* Fallback for older Safari */
+    border: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: none;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  input[type="color"]::-webkit-color-swatch {
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+  }
+
+
+  /* ── Step Navigation ── */
+  .step-indicator {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: #18181b;
+    color: #71717a;
+    transition: all 0.2s;
+  }
+  .step-indicator.active {
+    background: white; color: black; border-color: white;
+  }
+  .step-indicator.done {
+    background: #18181b; color: white; border-color: rgba(255,255,255,0.3);
+  }
+  .step-label {
+    font-size: 12px; font-weight: 500;
+    color: #52525b;
+    transition: color 0.2s;
+  }
+  .step-label.active { color: white; }
+  .step-label.done   { color: #a1a1aa; }
+
+  /* ── Event Type Cards ── */
+  .evt-type-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    background: rgba(24,24,27,0.5);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .evt-type-card:hover { border-color: rgba(255,255,255,0.2); }
+  .evt-type-card.selected {
+    border-color: white;
+    background: rgba(255,255,255,0.04);
+  }
+  .evt-type-card .card-expand {
+    display: none;
+  }
+  .evt-type-card.selected .card-expand {
+    display: block;
+  }
+
+  /* ── Image Upload (new style) ── */
+  .img-upload-zone {
+    min-height: 220px;
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 16px;
+    background: #09090b;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .img-upload-zone:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.02);
+  }
+</style>
+<body class="bg-[#050505] text-white">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 glass">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+    <a href="index.html" class="flex gap-2 items-center">
+      <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold">EN</div>
+      <span class="hidden sm:block font-semibold">ENTRIQS</span>
+    </a>
+    <div class="flex items-center gap-6 text-xs uppercase tracking-wider text-zinc-400">
+      <!-- Left: Public links -->
+      <a href="index.html" class="text-white">Home</a>
+      
+      <!-- View my Profile -->
+      <a href="events.html" id="eventsLink" class="text-xs uppercase tracking-wider">
+        Explore events
+      </a>
+
+      <!-- Profile Dropdown -->
+      <div class="relative">
+        <button
+          id="profileBtn"
+          class="hidden w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center hover:border-white/30 transition text-xs font-semibold text-white">
+        </button>
+
+        <div
+          id="profileDropdown"
+          class="hidden absolute right-0 mt-2 w-56 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-lg z-50">
+          <div class="px-4 py-3 border-b border-white/10">
+            <p class="text-sm font-medium" id="profileName">User Name</p>
+            <p class="text-xs text-zinc-400" id="profileEmail">user@email.com</p>
+          </div>
+
+          <div class="py-1">
+            <a href="organizer-dashboard.html" id="dropdownOrganizerLink" class="block px-4 py-2 text-sm hover:bg-white/5">
+              Organizer Dashboard
+            </a>
+
+            <a href="profile.html" id="dropdownProfileLink" class="block px-4 py-2 text-sm hover:bg-white/5">
+              My profile
+            </a>
+
+            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5">
+              Sign out
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="pt-16 max-w-7xl mx-auto px-6 py-12">
+  <!-- PAGE: ORGANIZER -->
+  <section id="organizer" class="page-section hidden-page max-w-7xl mx-auto px-6 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Sidebar -->
+      <div class="lg:col-span-3 space-y-6">
+        <div class="p-6 rounded-2xl border border-white/5 bg-zinc-900/30">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-white/10 text-white">
+              <span id="organizerInitials" class="font-semibold text-sm">--</span>
+            </div>
+            <div>
+              <h3 id="organizerName" class="text-sm font-medium">---</h3>
+              <p class="text-xs text-zinc-500">Organizer Account</p>
+            </div>
+          </div>
+          <button onclick="openCreateEventForm()" class="w-full py-2.5 bg-white text-black rounded-lg text-xs font-semibold hover:bg-zinc-200 transition-colors mb-4 flex justify-center items-center gap-2">
+            <iconify-icon icon="lucide:plus" width="14"></iconify-icon>
+            Create New Event
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-4 rounded-xl border border-white/5 bg-zinc-900/20">
+            <div id="activeEventsCount" class="text-2xl font-semibold tracking-tighter">0</div>
+            <div class="text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Active</div>
+          </div>
+          <div class="p-4 rounded-xl border border-white/5 bg-zinc-900/20">
+            <div id="totalTicketsSoldCount" class="text-2xl font-semibold tracking-tighter">0</div>
+            <div class="text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Tickets</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Organizer Content -->
+      <div class="lg:col-span-9 space-y-6">
+        <!-- Events List -->
+        <div class="rounded-2xl border border-white/5 bg-zinc-900/20 overflow-hidden">
+          <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+            <h3 class="text-sm font-semibold">Your Events</h3>
+            <div class="flex gap-2">
+              <button onclick="setFilter('all')" class="text-xs text-zinc-400 hover:text-white">All</button>
+              <button onclick="setFilter('drafts')" class="text-xs text-zinc-500 hover:text-white">Drafts</button>
+            </div>
+          </div>
+          <div id="eventsList" class="divide-y divide-white/5"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- STATS MODAL -->
+<div id="statsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/70 backdrop-blur-sm">
+  <div class="w-full max-w-xl bg-zinc-900 border border-white/10 rounded-2xl p-6 relative">
+    <button onclick="closeModal('statsModal')" class="absolute top-4 right-4 text-zinc-400 hover:text-white">
+      <iconify-icon icon="lucide:x" width="18"></iconify-icon>
+    </button>
+
+    <h3 id="statsEventName" class="text-lg font-semibold tracking-tight mb-6">Event Name</h3>
+
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="p-4 rounded-xl bg-zinc-800/50">
+        <p class="text-xs text-zinc-400">Revenue</p>
+        <p id="statsRevenue" class="text-lg font-semibold"></p>
+      </div>
+      <div class="p-4 rounded-xl bg-zinc-800/50">
+        <p class="text-xs text-zinc-400">Sold</p>
+        <p id="statsTickets" class="text-lg font-semibold"></p>
+      </div>
+      <div class="p-4 rounded-xl bg-zinc-800/50">
+        <p class="text-xs text-zinc-400">Views</p>
+        <p id="statsViews" class="text-lg font-semibold"></p>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <p class="text-xs text-zinc-400 mb-2 uppercase tracking-wider">Sales (Last 7 Days)</p>
+      <canvas id="statsChart" height="120"></canvas>
+    </div>
+
+    <div class="flex justify-end mt-6">
+      <button onclick="closeModal('statsModal')" class="text-xs text-zinc-400 hover:text-white">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE EVENT MODAL -->
+<div id="shareEventModal" class="fixed inset-0 z-[70] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeShareModal()"></div>
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      
+      <!-- Header -->
+      <div class="p-6 border-b border-white/10 flex justify-between items-start">
+        <div>
+          <h3 class="text-lg font-bold">Share Event</h3>
+          <p class="text-xs text-zinc-500 mt-1" id="shareEventName">Event Name</p>
+        </div>
+        <button onclick="closeShareModal()" class="text-zinc-400 hover:text-white">
+          <iconify-icon icon="lucide:x" width="20"></iconify-icon>
+        </button>
+      </div>
+
+      <!-- Link Copy Section -->
+      <div class="p-6 space-y-4">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="shareEventLink"
+            readonly
+            class="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 pr-20 text-sm text-white font-mono text-xs"
+            value="">
+          <button 
+            onclick="copyShareLink()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded hover:bg-indigo-500 transition-colors">
+            Copy
+          </button>
+        </div>
+
+        <!-- Quick Share Options -->
+        <div>
+          <p class="text-xs text-zinc-400 mb-3 uppercase tracking-wider">Quick Share</p>
+          <div class="grid grid-cols-3 gap-3">
+            <!-- WhatsApp -->
+            <button 
+              onclick="shareViaWhatsApp()"
+              class="flex flex-col items-center gap-2 p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors group">
+              <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                <iconify-icon icon="lucide:message-circle" width="18" class="text-green-500"></iconify-icon>
+              </div>
+              <span class="text-[10px] text-zinc-400">WhatsApp</span>
+            </button>
+
+            <!-- Email -->
+            <button 
+              onclick="shareViaEmail()"
+              class="flex flex-col items-center gap-2 p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors group">
+              <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                <iconify-icon icon="lucide:mail" width="18" class="text-blue-500"></iconify-icon>
+              </div>
+              <span class="text-[10px] text-zinc-400">Email</span>
+            </button>
+
+            <!-- QR Code -->
+            <button 
+              onclick="showQRCode()"
+              class="flex flex-col items-center gap-2 p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors group">
+              <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                <iconify-icon icon="lucide:qr-code" width="18" class="text-purple-500"></iconify-icon>
+              </div>
+              <span class="text-[10px] text-zinc-400">QR Code</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- QR Code Display (Hidden by default) -->
+        <div id="qrCodeSection" class="hidden pt-4 border-t border-white/10">
+          <div class="flex justify-center bg-white p-4 rounded-lg">
+            <div id="shareQRCode" class="w-48 h-48"></div>
+          </div>
+          <p class="text-xs text-zinc-500 text-center mt-3">Scan to open event page</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE INVITES MODAL -->
+<div id="manageInvitesModal" class="fixed inset-0 z-[70] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeManageInvites()"></div>
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[85vh] flex flex-col">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+
+      <!-- Header -->
+      <div class="p-6 border-b border-white/10 flex justify-between items-start shrink-0">
+        <div>
+          <h3 class="text-lg font-bold">Manage Invites</h3>
+          <p class="text-xs text-zinc-500 mt-1" id="manageInvitesEventName"></p>
+        </div>
+        <button onclick="closeManageInvites()" class="text-zinc-400 hover:text-white">
+          <iconify-icon icon="lucide:x" width="20"></iconify-icon>
+        </button>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="grid grid-cols-3 gap-3 p-6 border-b border-white/10 shrink-0">
+        <div class="p-3 rounded-xl bg-zinc-800/50 text-center">
+          <p id="inviteSummaryTotal" class="text-2xl font-semibold tracking-tighter">0</p>
+          <p class="text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Invited</p>
+        </div>
+        <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+          <p id="inviteSummaryAccepted" class="text-2xl font-semibold tracking-tighter text-emerald-400">0</p>
+          <p class="text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Accepted</p>
+        </div>
+        <div class="p-3 rounded-xl bg-zinc-800/50 text-center">
+          <p id="inviteSummaryDeclined" class="text-2xl font-semibold tracking-tighter text-zinc-400">0</p>
+          <p class="text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Declined</p>
+        </div>
+      </div>
+
+      <!-- Invite List -->
+      <div class="overflow-y-auto flex-1 custom-scrollbar">
+        <div id="invitesList" class="divide-y divide-white/5"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 🎟️ TICKET TEMPLATE EDITOR (FULL SCREEN) -->
+<div id="ticketTemplateEditor" class="fixed inset-0 z-[60] hidden bg-black">
+  <!-- Header -->
+  <header class="h-14 border-b border-white/10 bg-zinc-900 flex items-center justify-between px-6">
+    <h3 class="text-sm font-semibold text-white">Ticket Design Editor</h3>
+    <div class="flex items-center gap-3">
+      <button type="button" onclick="closeTicketTemplateEditor()" class="w-8 h-8 rounded hover:bg-white/5 flex items-center justify-center text-zinc-400">
+        <iconify-icon icon="lucide:x" width="20"></iconify-icon>
+      </button>
+      <div class="h-4 w-px bg-white/10"></div>
+      <button type="button" onclick="saveTicketTemplate()" class="px-4 py-1.5 bg-white text-black text-xs font-semibold rounded hover:bg-zinc-200 transition-colors">
+        Save & Continue
+      </button>
+    </div>
+  </header>
+
+  <!-- Editor Body -->
+  <div class="flex h-[calc(100vh-56px)] overflow-hidden">
+    
+    <!-- MAIN CANVAS AREA -->
+    <div class="flex-grow bg-[#0c0c0e] relative flex items-center justify-center overflow-auto p-8 canvas-grid">
+      
+      <!-- Zoom Controls -->
+      <div class="absolute top-4 right-4 flex gap-2 z-10">
+        <button onclick="zoomCanvas(0.5)" class="px-3 py-1.5 bg-zinc-800 text-xs text-white rounded hover:bg-zinc-700 border border-white/10">
+          50%
+        </button>
+        <button onclick="zoomCanvas(0.75)" class="px-3 py-1.5 bg-zinc-800 text-xs text-white rounded hover:bg-zinc-700 border border-white/10">
+          75%
+        </button>
+        <button onclick="zoomCanvas(1)" class="px-3 py-1.5 bg-zinc-800 text-xs text-white rounded hover:bg-zinc-700 border border-white/10">
+          100%
+        </button>
+      </div>
+
+      <!-- Fixed-Size Container (controls layout) -->
+      <div class="relative" style="width: 1024px; height: 331px;">
+        
+        <!-- Canvas Wrapper with Transform (visual zoom only) -->
+        <div id="canvasWrapper" class="absolute top-0 left-0" style="transform: scale(0.5); transform-origin: top left; width: 2048px; height: 662px;">
+          
+          <!-- The Ticket Canvas (actual 2048x662) -->
+          <div id="ticketCanvas" class="relative w-full h-full bg-zinc-900 shadow-2xl overflow-visible ring-1 ring-white/10">
+            <!-- Background Image -->
+            <img id="templateBg" src="" class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-0 transition-opacity" />
+            
+            <!-- Draggable labels will be added here by JavaScript -->
+          </div>
+
+          <!-- Canvas Dimensions Tooltip -->
+          <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-zinc-800/80 backdrop-blur px-3 py-1 rounded-full text-[10px] text-zinc-400 border border-white/5 font-mono whitespace-nowrap">
+            2048 × 662px
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR CONTROLS -->
+    <div class="w-80 bg-zinc-900 border-l border-white/10 flex flex-col h-full z-20">
+      <div class="p-5 overflow-y-auto flex-grow space-y-6">
+        
+        <!-- Section 1: Template Background -->
+        <div>
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Template Background</h4>
+          <div class="border border-dashed border-white/10 rounded-lg p-4 text-center hover:bg-white/5 transition-colors cursor-pointer group bg-zinc-950">
+            <input type="file" id="templateBgInput" accept="image/*" class="hidden" onchange="handleTemplateBgUpload(event)" />
+            <div class="w-full h-24 bg-zinc-800 mb-2 rounded overflow-hidden relative" onclick="document.getElementById('templateBgInput').click()">
+              <img id="templateBgPreview" src="" class="w-full h-full object-cover opacity-0" />
+              <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="text-xs">Upload Image</span>
+              </div>
+            </div>
+            <p class="text-xs text-zinc-400">Click or Drop image</p>
+          </div>
+        </div>
+
+        <!-- Section 1.5: Preview Mode Toggle -->
+        <div>
+          <button 
+            id="previewModeBtn"
+            onclick="togglePreviewMode()"
+            class="w-full py-3 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition-colors flex items-center justify-center gap-2">
+            <iconify-icon icon="lucide:eye" width="16"></iconify-icon>
+            Preview Mode
+          </button>
+          <p class="text-[10px] text-zinc-500 mt-2 text-center">
+            See your ticket with sample data
+          </p>
+        </div>
+
+        <!-- Section 2: Add Labels -->
+        <div>
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Add Data Fields</h4>
+          <div class="space-y-2">
+            <button onclick="addLabelToCanvas('ATTENDEE_NAME')" class="w-full py-2 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded text-xs font-medium hover:bg-indigo-500/20 transition-colors">
+              + Attendee Name
+            </button>
+            <button onclick="addLabelToCanvas('TICKET_ID')" class="w-full py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded text-xs font-medium hover:bg-emerald-500/20 transition-colors">
+              + Ticket ID
+            </button>
+            <button onclick="addLabelToCanvas('EVENT_DATE')" class="w-full py-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded text-xs font-medium hover:bg-amber-500/20 transition-colors">
+              + Event Date
+            </button>
+            <button onclick="addLabelToCanvas('QR_CODE')" class="w-full py-2 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded text-xs font-medium hover:bg-purple-500/20 transition-colors">
+              + QR Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 3: Active Labels -->
+        <!-- Section 3: Active Labels -->
+        <div>
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Active Labels</h4>
+          <div id="labelsListContainer" class="space-y-2 text-xs text-zinc-500">
+            <p class="text-center py-4">No labels added yet</p>
+          </div>
+        </div>
+
+        <!-- Section 4: Label Editor Panel (NEW!) -->
+        <div id="labelEditPanel" class="hidden border-t border-white/10 pt-6 space-y-4">
+          <div class="flex items-center justify-between mb-2">
+            <h4 id="labelEditorTitle" class="text-xs font-semibold uppercase tracking-wider text-white">Edit Label</h4>
+            <button onclick="closeLabelEditPanel()" class="text-zinc-500 hover:text-white transition-colors">
+              <iconify-icon icon="lucide:x" width="14"></iconify-icon>
+            </button>
+          </div>
+
+          <!-- Font Size Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-xs text-zinc-400">Font Size</label>
+              <span id="fontSizeDisplay" class="text-xs font-mono text-white bg-zinc-800 px-2 py-0.5 rounded">32px</span>
+            </div>
+            <input 
+              type="range" 
+              id="labelFontSize" 
+              min="16" 
+              max="96" 
+              value="32" 
+              class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              oninput="updateFontSizeDisplay()"
+              onchange="updateFontSizeDisplay()">
+            <div class="flex justify-between text-[10px] text-zinc-600">
+              <span>16px</span>
+              <span>96px</span>
+            </div>
+          </div>
+
+          <!-- Font Family Dropdown -->
+          <div class="space-y-2">
+            <label class="text-xs text-zinc-400">Font Family</label>
+            <select 
+              id="labelFontFamily" 
+              class="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-white/30 focus:outline-none cursor-pointer"
+              onchange="updateFontFamilyLive()">
+              <option value="Inter, sans-serif">Inter</option>
+              <option value="Poppins, sans-serif">Poppins</option>
+              <option value="Roboto, sans-serif">Roboto</option>
+              <option value="Montserrat, sans-serif">Montserrat</option>
+              <option value="JetBrains Mono, monospace">JetBrains Mono</option>
+              <option value="Playfair Display, serif">Playfair Display</option>
+              <option value="Space Grotesk, sans-serif">Space Grotesk</option>
+            </select>
+          </div>
+
+          <!-- Text Color Picker -->
+          <div class="space-y-2">
+            <label class="text-xs text-zinc-400">Text Color</label>
+            <div class="flex gap-2 items-center">
+              <input 
+                type="color" 
+                id="labelColor" 
+                value="#000000" 
+                class="w-12 h-12 rounded-lg cursor-pointer border-2 border-white/10"
+                onchange="updateColorLive()">
+              <input 
+                type="text" 
+                id="labelColorHex"
+                value="#000000" 
+                readonly
+                class="flex-1 bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono">
+            </div>
+          </div>
+
+          <!-- Apply Button -->
+          <button 
+            onclick="applyLabelChanges()"
+            class="w-full py-2.5 bg-indigo-500 text-white text-xs font-semibold rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2">
+            <iconify-icon icon="lucide:check" width="14"></iconify-icon>
+            Apply Changes
+          </button>
+        </div>
+
+      </div>
+      
+      <!-- Section 4: Footer Actions -->
+      <div class="p-4 border-t border-white/10 bg-zinc-900 space-y-3">
+        <button onclick="resetTicketCanvas()" class="w-full py-2 bg-zinc-800 text-zinc-300 text-xs font-medium rounded hover:bg-zinc-700 transition-colors border border-white/5">
+          Reset Layout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CREATE EVENT OVERLAY (3-step)
+════════════════════════════════════════ -->
+<div id="createEventOverlay" class="fixed inset-0 z-[80] hidden">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="cancelEdit()"></div>
+  <!-- Modal -->
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl border border-white/10 bg-[#050505] shadow-2xl overflow-hidden">
+
+  <!-- Overlay Header -->
+  <!-- Modal Header -->
+  <div class="shrink-0 border-b border-white/8 px-6 py-4 flex items-center justify-between bg-[#050505]">
+  <div class="w-full max-w-3xl px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-8">
+        <!-- Step indicators -->
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <div class="step-indicator active" id="stepIndicator1">1</div>
+            <span class="step-label active hidden sm:block" id="stepLabel1">Basic Details</span>
+          </div>
+          <div class="w-8 h-px bg-white/10"></div>
+          <div class="flex items-center gap-2">
+            <div class="step-indicator" id="stepIndicator2">2</div>
+            <span class="step-label hidden sm:block" id="stepLabel2">Event Type</span>
+          </div>
+          <div class="w-8 h-px bg-white/10"></div>
+          <div class="flex items-center gap-2">
+            <div class="step-indicator" id="stepIndicator3">3</div>
+            <span class="step-label hidden sm:block" id="stepLabel3">Review</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="overlayDraftBadge" class="hidden px-2 py-1 rounded-md bg-zinc-900 border border-white/10 text-zinc-300 text-xs">Draft</span>
+        <button onclick="cancelEdit()" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors">
+          <iconify-icon icon="lucide:x" width="16"></iconify-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay Body -->
+  <div class="overflow-y-auto flex-1 px-6 py-8 custom-scrollbar">
+    <!-- ══ STEP 1: Basic Details ══ -->
+    <div id="overlayStep1" class="space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight mb-1">Basic Details</h2>
+        <p class="text-zinc-500 text-sm">Tell people about your event</p>
+      </div>
+
+      <div class="bg-zinc-900/50 border border-white/8 rounded-2xl p-6 space-y-5">
+
+        <!-- Event Name -->
+        <div class="space-y-2">
+          <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Event Name</label>
+          <input type="text" name="eventName" id="ol_eventName"
+            class="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-white/30 transition-colors"
+            placeholder="e.g. Summer Festival 2026">
+        </div>
+
+        <!-- Date + Time -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Date</label>
+            <div class="relative">
+              <iconify-icon icon="lucide:calendar" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" width="15"></iconify-icon>
+              <input type="date" name="eventDate" id="ol_eventDate"
+                class="w-full bg-zinc-950 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-white/30 transition-colors">
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Time</label>
+            <div class="relative">
+              <iconify-icon icon="lucide:clock" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" width="15"></iconify-icon>
+              <input type="time" name="eventTime" id="ol_eventTime"
+                class="w-full bg-zinc-950 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-white/30 transition-colors">
+            </div>
+          </div>
+        </div>
+
+        <!-- Location + Category -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Location</label>
+            <div class="relative">
+              <iconify-icon icon="lucide:map-pin" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" width="15"></iconify-icon>
+              <input type="text" name="location" id="ol_location"
+                class="w-full bg-zinc-950 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-white/30 transition-colors"
+                placeholder="e.g. Lagos, Nigeria">
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Category</label>
+            <input type="text" name="category" id="ol_category"
+              class="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-white/30 transition-colors"
+              placeholder="e.g. Music, Workshop, Wedding">
+          </div>
+        </div>
+
+        <!-- Event Format -->
+        <div class="space-y-2">
+          <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Event Format</label>
+          <div class="flex p-1 bg-zinc-950 rounded-full border border-white/10 w-fit">
+            <button type="button" onclick="selectOlFormat('in_person', this)"
+              class="ol-format-btn px-5 py-2 rounded-full text-xs font-medium transition-all border border-white text-white bg-zinc-800">
+              In-person
+            </button>
+            <button type="button" onclick="selectOlFormat('online', this)"
+              class="ol-format-btn px-5 py-2 rounded-full text-xs font-medium transition-all border border-transparent text-zinc-400 hover:text-zinc-200">
+              Online
+            </button>
+          </div>
+          <input type="hidden" id="ol_eventFormat" value="in_person">
+        </div>
+
+        <!-- Description -->
+        <div class="space-y-2">
+          <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Description</label>
+          <textarea name="description" id="ol_description" rows="4"
+            class="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-white/30 transition-colors resize-none"
+            placeholder="Tell people what your event is about..."></textarea>
+        </div>
+
+        <!-- Cover Image -->
+        <div class="space-y-2">
+          <label class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Cover Image</label>
+          <div id="ol_dropZone" class="img-upload-zone relative group">
+            <input type="file" id="ol_fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleImageUpload(event)">
+
+            <!-- Empty state -->
+            <div id="ol_emptyState" class="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center pointer-events-none">
+              <div class="w-12 h-12 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-500 group-hover:text-white group-hover:bg-zinc-800 transition-all">
+                <iconify-icon icon="lucide:image-plus" width="20"></iconify-icon>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-zinc-200">Click or drag image here</p>
+                <p class="text-xs text-zinc-600 mt-1 uppercase tracking-wider">Recommended: 1920×1080 • PNG / JPG</p>
+              </div>
+            </div>
+
+            <!-- Preview state -->
+            <div id="ol_previewState" class="hidden absolute inset-0 bg-zinc-950 z-30 p-4 flex flex-col rounded-2xl">
+              <div class="flex justify-between items-center mb-4 shrink-0">
+                <div class="flex items-center gap-2 text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                  <iconify-icon icon="lucide:check-circle" width="13"></iconify-icon>
+                  <span class="text-xs font-semibold uppercase tracking-wider">Image Ready</span>
+                </div>
+                <button type="button" onclick="removeImage()" class="text-xs text-zinc-400 hover:text-red-400 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 hover:border-red-500/30 transition-colors flex items-center gap-1.5">
+                  <iconify-icon icon="lucide:trash-2" width="12"></iconify-icon>
+                  Remove
+                </button>
+              </div>
+              <!-- Horizontal scroll previews -->
+              <div class="flex gap-5 overflow-x-auto pb-2 custom-scrollbar flex-1">
+                <div class="flex flex-col gap-2 min-w-[220px]">
+                  <span class="text-[10px] text-zinc-500 uppercase tracking-wider flex items-center gap-1">
+                    <iconify-icon icon="lucide:image" width="11"></iconify-icon> Card View (4:3)
+                  </span>
+                  <div class="aspect-[4/3] rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+                    <img id="ol_previewCard" class="w-full h-full object-cover">
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2 min-w-[340px]">
+                  <span class="text-[10px] text-zinc-500 uppercase tracking-wider flex items-center gap-1">
+                    <iconify-icon icon="lucide:panorama" width="11"></iconify-icon> Header View (21:9)
+                  </span>
+                  <div class="aspect-[21/9] rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+                    <img id="ol_previewBanner" class="w-full h-full object-cover">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1 Navigation -->
+      <div class="flex justify-end pt-2">
+        <button onclick="goToStep(2)"
+          class="px-6 py-3 bg-white text-black text-sm font-semibold rounded-xl hover:bg-zinc-200 transition-colors flex items-center gap-2">
+          Continue to Event Type
+          <iconify-icon icon="lucide:arrow-right" width="15"></iconify-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2: Event Type ══ -->
+    <div id="overlayStep2" class="hidden space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight mb-1">Event Type</h2>
+        <p class="text-zinc-500 text-sm">Choose how people access your event</p>
+      </div>
+
+      <!-- Card 1: Public -->
+      <div class="evt-type-card selected" onclick="selectEventSubtype('public', this)">
+        <div class="p-6 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-xl shrink-0">🌍</div>
+          <div class="flex-1">
+            <h3 class="text-base font-semibold text-white">Public Event</h3>
+            <p class="text-sm text-zinc-400 mt-0.5">Visible to everyone on Entriqs</p>
+          </div>
+          <div class="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center shrink-0 mt-1">
+            <div class="w-2.5 h-2.5 rounded-full bg-white"></div>
+          </div>
+        </div>
+        <div class="card-expand border-t border-white/8 px-6 pb-6 pt-5 space-y-4">
+          <div id="ol_ticketTiersPublic" class="space-y-3">
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
+                <iconify-icon icon="lucide:ticket" width="13"></iconify-icon> Ticket Tiers
+              </label>
+              <span class="text-[10px] text-zinc-600 uppercase tracking-wider">Pricing & Availability</span>
+            </div>
+            <div id="ticketTiersContainer" class="space-y-3"></div>
+            <button type="button" onclick="addTicketTier()"
+              class="w-full py-3 rounded-xl border border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30 text-zinc-500 hover:text-zinc-300 transition-all text-xs font-medium flex items-center justify-center gap-2">
+              <iconify-icon icon="lucide:plus-circle" width="13"></iconify-icon>
+              Add Another Ticket Tier
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Private Ticketed -->
+      <div class="evt-type-card" onclick="selectEventSubtype('private_ticketed', this)">
+        <div class="p-6 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-xl shrink-0">🔒</div>
+          <div class="flex-1">
+            <h3 class="text-base font-semibold text-white">Private Ticketed</h3>
+            <p class="text-sm text-zinc-400 mt-0.5">Access via invite link only — attendees purchase tickets</p>
+          </div>
+          <div class="w-5 h-5 rounded-full border-2 border-zinc-600 flex items-center justify-center shrink-0 mt-1">
+            <div class="w-2.5 h-2.5 rounded-full bg-white scale-0 transition-transform"></div>
+          </div>
+        </div>
+        <div class="card-expand border-t border-white/8 px-6 pb-6 pt-5 space-y-4">
+          <div class="flex items-start gap-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+            <iconify-icon icon="lucide:info" width="14" class="text-indigo-400 mt-0.5 shrink-0"></iconify-icon>
+            <p class="text-xs text-indigo-300">An invite link will be auto-generated after publishing</p>
+          </div>
+          <div id="ol_ticketTiersPrivate" class="space-y-3">
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
+                <iconify-icon icon="lucide:ticket" width="13"></iconify-icon> Ticket Tiers
+              </label>
+              <span class="text-[10px] text-zinc-600 uppercase tracking-wider">Pricing & Availability</span>
+            </div>
+            <div id="ticketTiersContainerPrivate" class="space-y-3"></div>
+            <button type="button" onclick="addTicketTierPrivate()"
+              class="w-full py-3 rounded-xl border border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30 text-zinc-500 hover:text-zinc-300 transition-all text-xs font-medium flex items-center justify-center gap-2">
+              <iconify-icon icon="lucide:plus-circle" width="13"></iconify-icon>
+              Add Another Ticket Tier
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Private Invite Only -->
+      <div class="evt-type-card" onclick="selectEventSubtype('invite_only', this)">
+        <div class="p-6 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-xl shrink-0">✉️</div>
+          <div class="flex-1">
+            <h3 class="text-base font-semibold text-white">Private Invite Only</h3>
+            <p class="text-sm text-zinc-400 mt-0.5">By invitation only — no ticket purchase required</p>
+          </div>
+          <div class="w-5 h-5 rounded-full border-2 border-zinc-600 flex items-center justify-center shrink-0 mt-1">
+            <div class="w-2.5 h-2.5 rounded-full bg-white scale-0 transition-transform"></div>
+          </div>
+        </div>
+        <div class="card-expand border-t border-white/8 px-6 pb-6 pt-5 space-y-5">
+          <!-- Add Attendee Form -->
+          <div class="p-5 bg-zinc-950 border border-white/8 rounded-xl space-y-4">
+            <h4 class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Add Attendee</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input type="text" id="inv_fullName" placeholder="Full Name"
+                class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white/30 transition-colors">
+              <input type="email" id="inv_email" placeholder="Email Address"
+                class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white/30 transition-colors">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="relative">
+                <select id="inv_role" class="w-full appearance-none bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/30 transition-colors">
+                  <option value="" disabled selected>Select Role</option>
+                  <option>Guest</option>
+                  <option>VIP</option>
+                  <option>Speaker</option>
+                  <option>Staff</option>
+                  <option>Custom</option>
+                </select>
+                <iconify-icon icon="lucide:chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" width="14"></iconify-icon>
+              </div>
+              <input type="text" id="inv_seat" placeholder="Seat (e.g. Table 3, Seat 2)"
+                class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white/30 transition-colors">
+              <div class="flex items-center justify-between bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5">
+                <span class="text-sm text-zinc-300">Plus One</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="inv_plusOne" class="sr-only peer">
+                  <div class="w-8 h-4 bg-zinc-700 rounded-full peer peer-checked:bg-indigo-500 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                </label>
+              </div>
+            </div>
+            <input type="text" id="inv_note" placeholder="Note (e.g. Dietary requirements)"
+              class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white/30 transition-colors">
+            <button type="button" onclick="addInviteAttendee()"
+              class="w-full py-2.5 bg-white text-black text-sm font-semibold rounded-xl hover:bg-zinc-200 transition-colors">
+              Add Attendee
+            </button>
+          </div>
+          <!-- Attendee List -->
+          <div id="inviteAttendeeList" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- Step 2 Navigation -->
+      <div class="flex justify-between pt-2">
+        <button onclick="goToStep(1)"
+          class="px-6 py-3 bg-zinc-900 text-white text-sm font-semibold rounded-xl hover:bg-zinc-800 border border-white/10 transition-colors flex items-center gap-2">
+          <iconify-icon icon="lucide:arrow-left" width="15"></iconify-icon>
+          Back
+        </button>
+        <button onclick="goToStep(3)"
+          class="px-6 py-3 bg-white text-black text-sm font-semibold rounded-xl hover:bg-zinc-200 transition-colors flex items-center gap-2">
+          Review Event
+          <iconify-icon icon="lucide:arrow-right" width="15"></iconify-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3: Review ══ -->
+    <div id="overlayStep3" class="hidden space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight mb-1">Review & Publish</h2>
+        <p class="text-zinc-500 text-sm">Check everything looks right before publishing</p>
+      </div>
+
+      <div class="bg-zinc-900/50 border border-white/8 rounded-2xl p-6 space-y-6">
+        <!-- Event summary -->
+        <div class="flex gap-5">
+          <div id="review_image" class="w-20 h-20 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center text-zinc-600">
+            <iconify-icon icon="lucide:image" width="24"></iconify-icon>
+          </div>
+          <div class="flex-1 space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="review_typeBadge" class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-white/10">Public</span>
+              <span id="review_formatBadge" class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-white/10">In-Person</span>
+            </div>
+            <h3 id="review_name" class="text-lg font-bold text-white">—</h3>
+            <p id="review_meta" class="text-sm text-zinc-400">—</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-white/8">
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Date</p>
+            <p id="review_date" class="text-sm font-medium text-white">—</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Time</p>
+            <p id="review_time" class="text-sm font-medium text-white">—</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Location</p>
+            <p id="review_location" class="text-sm font-medium text-white">—</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Category</p>
+            <p id="review_category" class="text-sm font-medium text-white">—</p>
+          </div>
+        </div>
+
+        <!-- Tickets or Attendees summary -->
+        <div id="review_ticketsSection" class="pt-2 border-t border-white/8 space-y-3">
+          <p class="text-[10px] text-zinc-500 uppercase tracking-wider">Ticket Tiers</p>
+          <div id="review_ticketsList" class="space-y-2"></div>
+        </div>
+        <div id="review_attendeesSection" class="hidden pt-2 border-t border-white/8 space-y-3">
+          <p class="text-[10px] text-zinc-500 uppercase tracking-wider">Invited Attendees</p>
+          <p id="review_attendeesCount" class="text-sm font-semibold text-white">0 attendees</p>
+        </div>
+      </div>
+
+      <!-- Step 3 Navigation -->
+      <div class="flex items-center justify-between pt-2">
+        <button onclick="goToStep(2)"
+          class="px-6 py-3 bg-zinc-900 text-white text-sm font-semibold rounded-xl hover:bg-zinc-800 border border-white/10 transition-colors flex items-center gap-2">
+          <iconify-icon icon="lucide:arrow-left" width="15"></iconify-icon>
+          Back
+        </button>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="handleOverlaySaveDraft()"
+            class="px-6 py-3 border border-white/10 text-zinc-300 text-sm font-semibold rounded-xl hover:bg-zinc-900 hover:text-white transition-colors">
+            Save as Draft
+          </button>
+          <button type="button" onclick="handleOverlayPublish()"
+            class="px-6 py-3 bg-white text-black text-sm font-semibold rounded-xl hover:bg-zinc-200 transition-colors flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+            <iconify-icon icon="lucide:rocket" width="15"></iconify-icon>
+            Publish Event
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>  
+  </div>    
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="organizer-dashboard.js"></script>
+<script>
+// 🔹 Profile dropdown handling
+  const profileBtn = document.getElementById("profileBtn");
+  const profileDropdown = document.getElementById("profileDropdown");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (profileBtn) {
+    profileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.toggle("hidden");
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", logout);
+  }
+
+  // 🔹 Close dropdown when clicking outside
+  document.addEventListener("click", () => {
+    if (profileDropdown) {
+      profileDropdown.classList.add("hidden");
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>Entriqs - Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+  <!-- Auth -->
+  <script>
+    window.PAGE_MODE = "protected";
+  </script>
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            background: "#050505",
+            surface: "#18181b",
+          },
+          animation: {
+            "fade-in": "fadeIn 0.4s ease-out",
+          },
+          keyframes: {
+            fadeIn: {
+              "0%": { opacity: 0, transform: "translateY(10px)" },
+              "100%": { opacity: 1, transform: "translateY(0)" },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Internal Styling (kept minimal + intentional) -->
+  <style>
+    body {
+      background-color: #050505;
+      color: #fafafa;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.1),
+        0 0 0 4px rgba(255,255,255,0.05);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 3px;
+    }
+
+    .interest-tag.selected {
+      background: rgba(99,102,241,0.15);
+      border-color: rgba(99,102,241,0.5);
+      color: #a5b4fc;
+    }
+    .interest-tag:disabled {
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen font-sans text-sm selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- MAIN -->
+  <main class="pt-24 pb-12 px-6 animate-fade-in">
+    <div class="max-w-3xl mx-auto">
+
+      <!-- Header -->
+      <header class="mb-10 flex items-center gap-4">
+        <button
+          id="backBtn"
+          class="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
+          aria-label="Go back"
+        >
+          <iconify-icon icon="solar:arrow-left-linear" width="20"></iconify-icon>
+        </button>
+
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight">Account Settings</h1>
+          <p class="text-zinc-400 mt-1">
+            Manage your profile information and public identity.
+          </p>
+        </div>
+      </header>
+
+      <!-- Profile Card -->
+      <section class="bg-zinc-900/40 border border-white/5 rounded-2xl p-8 relative overflow-hidden">
+
+        <!-- Decorative Blur -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+        <!-- AVATAR + IDENTITY -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 pb-8 border-b border-white/5 relative z-10">
+
+          <!-- Avatar -->
+          <div id="avatarWrapper" class="relative group cursor-pointer shrink-0">
+            <div
+              id="avatarCircle"
+              class="w-24 h-24 rounded-full
+                     bg-gradient-to-br from-zinc-800 to-zinc-950
+                     border-2 border-white/10
+                     overflow-hidden
+                     flex items-center justify-center
+                     text-white text-2xl font-semibold
+                     shadow-2xl
+                     transition-all">
+            </div>
+            
+            <!-- Clear Avatar Button -->
+            <button
+              id="clearAvatarBtn"
+              type="button"
+              class="absolute -top-1 -right-1 z-20
+                    w-7 h-7 rounded-full
+                    bg-zinc-900/90 border border-white/10
+                    flex items-center justify-center
+                    text-zinc-400 hover:text-red-400
+                    hover:bg-red-500/10
+                    transition-all
+                    shadow-lg
+                    hidden"
+              aria-label="Remove photo"
+            >
+              <iconify-icon
+                icon="solar:trash-bin-minimalistic-linear"
+                width="14">
+              </iconify-icon>
+
+              <!-- Tooltip -->
+              <span
+                class="absolute top-1/2 left-full ml-2 -translate-y-1/2
+                      whitespace-nowrap
+                      px-2 py-1 rounded-md
+                      text-[10px]
+                      bg-black text-white
+                      opacity-0 pointer-events-none
+                      group-hover:opacity-100
+                      transition-opacity">
+                Remove photo
+              </span>
+            </button>
+
+            <!-- Hover Overlay -->
+            <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center
+                        opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm">
+              <iconify-icon icon="solar:camera-add-linear" width="24" class="text-white"></iconify-icon>
+            </div>
+
+            <input type="file" id="avatarInput" accept="image/*" class="hidden" />
+          </div>
+
+          <!-- Identity -->
+          <div class="space-y-1.5">
+            <h3 id="displayName" class="text-xl font-semibold">—</h3>
+            <div class="flex items-center gap-3">
+              <p id="displayEmail" class="text-sm text-zinc-400 font-mono">—</p>
+
+              <!-- Role Badge -->
+              <span
+                id="roleBadge"
+                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full
+                       text-[10px] font-medium uppercase tracking-wide
+                       bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+              >
+                <iconify-icon icon="solar:verified-check-linear" width="12"></iconify-icon>
+                —
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM -->
+        <form id="profileForm" class="pt-8 space-y-6 max-w-2xl relative z-10">
+
+          <!-- Names -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-zinc-400 uppercase">First Name</label>
+              <input id="firstNameInput" type="text"
+                class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white transition-colors hover:border-white/20 focus:border-indigo-500/50" />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-zinc-400 uppercase">Last Name</label>
+              <input id="lastNameInput" type="text"
+                class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white transition-colors hover:border-white/20 focus:border-indigo-500/50" />
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-2">
+            <label class="text-xs font-medium text-zinc-400 uppercase">Email Address</label>
+            <input id="emailInput" type="email" disabled
+              class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white opacity-70" />
+          </div>
+
+          <!-- Organization -->
+          <!-- Organizer-only section -->
+          <div id="organizerSection" class="pt-4 space-y-6 hidden">
+            <div class="flex items-center gap-4">
+              <div class="h-px bg-white/5 flex-grow"></div>
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 font-semibold">
+                Organization Details
+              </span>
+              <div class="h-px bg-white/5 flex-grow"></div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-zinc-400 uppercase">Organization Name</label>
+              <input id="orgNameInput" type="text"
+                class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white transition-colors hover:border-white/20 focus:border-indigo-500/50" />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-zinc-400 uppercase">Public Bio</label>
+              <textarea id="bioInput"
+                class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white h-28 resize-none transition-colors hover:border-white/20 focus:border-indigo-500/50"></textarea>
+            </div>
+          </div>
+
+          <!-- Attendee-only section -->
+          <div id="attendeeSection" class="pt-4 space-y-6 hidden">
+            <div class="flex items-center gap-4">
+              <div class="h-px bg-white/5 flex-grow"></div>
+              <span class="text-[10px] uppercase tracking-widest text-zinc-600 font-semibold">
+                Personal Details
+              </span>
+              <div class="h-px bg-white/5 flex-grow"></div>
+            </div>
+
+            <!-- Phone + DOB -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-zinc-400 uppercase">Phone Number</label>
+                <input id="phoneInput" type="tel"
+                  class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white transition-colors hover:border-white/20 focus:border-indigo-500/50"
+                  placeholder="+234 800 000 0000" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-zinc-400 uppercase">Date of Birth</label>
+                <input id="dobInput" type="date"
+                  class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-400 transition-colors hover:border-white/20 focus:border-indigo-500/50" />
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-zinc-400 uppercase">City / Location</label>
+              <input id="cityInput" type="text"
+                class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white transition-colors hover:border-white/20 focus:border-indigo-500/50"
+                placeholder="e.g. Lagos, Nigeria" />
+            </div>
+
+            <!-- Interests -->
+            <div class="space-y-3">
+              <label class="text-xs font-medium text-zinc-400 uppercase">Event Interests</label>
+              <div class="flex flex-wrap gap-2" id="interestsContainer">
+                <button type="button" data-interest="Music" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  🎵 Music
+                </button>
+                <button type="button" data-interest="Food" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  🍔 Food
+                </button>
+                <button type="button" data-interest="Tech" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  💻 Tech
+                </button>
+                <button type="button" data-interest="Sports" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  ⚽ Sports
+                </button>
+                <button type="button" data-interest="Arts" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  🎨 Arts
+                </button>
+                <button type="button" data-interest="Comedy" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  😂 Comedy
+                </button>
+                <button type="button" data-interest="Business" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  💼 Business
+                </button>
+                <button type="button" data-interest="Fashion" onclick="toggleInterest(this)"
+                  class="interest-tag px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-zinc-400 bg-zinc-900 hover:border-white/30 transition-colors">
+                  👗 Fashion
+                </button>
+              </div>
+            </div>
+
+            <!-- Bio -->
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-zinc-400 uppercase">Bio</label>
+              <textarea id="bioInput"
+                class="w-full bg-zinc-950 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white h-24 resize-none transition-colors hover:border-white/20 focus:border-indigo-500/50"
+                placeholder="Tell organizers a bit about yourself..."></textarea>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pt-8 flex justify-end gap-3">
+
+            <button
+              type="button"
+              id="editBtn"
+              class="px-6 py-2.5 bg-white text-black text-xs font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)]"
+            >
+              Edit details
+            </button>
+
+            <button type="button" id="discardBtn"
+              class="px-5 py-2.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-colors hidden">
+              Discard
+            </button>
+
+            <button type="submit" id="saveBtn"
+              class="px-6 py-2.5 bg-white text-black text-xs font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] hidden">
+              Save Changes
+            </button>
+          </div>
+        </form>
+
+        <!-- Danger Zone -->
+        <div class="border-t border-red-500/10 pt-8 mt-10">
+          <h4 class="text-sm font-medium text-red-400 mb-2">Danger Zone</h4>
+          <div class="flex justify-between items-center p-4 rounded-xl border border-red-500/10 bg-red-500/5">
+            <p class="text-xs text-zinc-500">
+              Permanently delete your account and all associated data.
+            </p>
+            <button id="deleteAccountBtn"
+              class="px-4 py-2 border border-red-500/20 rounded-lg text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors">
+              Delete Account
+            </button>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="auth.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

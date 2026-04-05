@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entriqs – Events</title>
+<script>window.PAGE_MODE = "public";</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<style>
+  * { font-family: 'DM Sans', sans-serif; }
+
+  body {
+    background: #080808;
+    background-image: radial-gradient(ellipse 80% 40% at 50% -10%, rgba(99,102,241,0.10) 0%, transparent 70%);
+  }
+
+  /* ── Event Card ── */
+  .event-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.3s cubic-bezier(.22,.68,0,1.2), border-color 0.2s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+  .event-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+
+  /* ── Card Image ── */
+  .card-image {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    background: #1a1a1a;
+  }
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.5s cubic-bezier(.22,.68,0,1.2);
+    filter: brightness(0.82) saturate(1.1);
+  }
+  .event-card:hover .card-image img { transform: scale(1.06); }
+  .card-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.05) 20%, rgba(0,0,0,0.75) 100%);
+  }
+  .card-image-fallback {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+  }
+
+  /* ── Overlay on image ── */
+  .card-image-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 14px 16px;
+    z-index: 2;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 999px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border: 1px solid; backdrop-filter: blur(8px);
+  }
+  .badge-category { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.35); color: #a5b4fc; }
+  .badge-public   { background: rgba(0,0,0,0.45); border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.5); }
+  .badge-private  { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
+
+  /* ── Card Body ── */
+  .card-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; }
+
+  /* ── Divider ── */
+  .card-divider {
+    height: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.07), transparent);
+    margin: 12px 0;
+  }
+
+  /* ── Countdown strip ── */
+  .countdown-strip { display: flex; align-items: center; gap: 8px; }
+  .countdown-unit  { display: flex; flex-direction: column; align-items: center; min-width: 28px; }
+  .countdown-num   { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: white; line-height: 1; }
+  .countdown-lbl   { font-size: 8px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 2px; }
+  .countdown-sep   { color: rgba(255,255,255,0.18); font-size: 13px; padding-bottom: 8px; }
+
+  .live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #00ffb4; }
+  .live-dot   { width: 6px; height: 6px; background: #00ffb4; border-radius: 50%; animation: livePulse 1.5s ease-in-out infinite; }
+  @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+
+  /* ── View button ── */
+  .view-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 16px; background: white; color: black;
+    font-size: 12px; font-weight: 600; border-radius: 10px;
+    border: none; cursor: pointer; margin-top: auto;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .view-btn:hover { background: #e4e4e7; transform: scale(1.01); }
+  .view-btn-live { background: #ffffff; color: #000; }
+  .view-btn-live:hover { background: #ffffff; }
+
+  /* ── Nav ── */
+  .glass { background: rgba(8,8,8,0.75); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+  /* ── Search ── */
+  .search-input {
+    padding: 9px 16px 9px 38px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 10px; color: white; font-size: 13px;
+    outline: none; width: 240px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .search-input:focus { border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.08); }
+  .search-input::placeholder { color: rgba(255,255,255,0.28); }
+
+  /* ── Category tabs ── */
+  .cat-tab {
+    padding: 5px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer; border: 1px solid transparent;
+    transition: all 0.15s; white-space: nowrap; background: none;
+  }
+  .cat-tab:hover { color: rgba(255,255,255,0.75); }
+  .cat-tab.active { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.11); color: white; }
+
+  /* ── Filter dropdown ── */
+  #filterDropdown { transform-origin: top right; transition: opacity 0.15s ease, transform 0.15s ease; }
+  #filterDropdown.hidden { opacity: 0; transform: scale(0.96); pointer-events: none; }
+  #filterDropdown:not(.hidden) { opacity: 1; transform: scale(1); }
+
+  /* ── Card fade-up animation ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  .card-animate { animation: fadeUp 0.4s ease-out both; }
+
+  /* ── Modal ── */
+  .ticket-selected { border-color: white !important; background: rgba(255,255,255,0.08); }
+</style>
+
+<body class="text-white min-h-screen">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 glass">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+    <a href="index.html" class="flex gap-2 items-center">
+      <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-sm">EN</div>
+      <span class="hidden sm:block font-semibold tracking-tight">ENTRIQS</span>
+    </a>
+    <div class="flex items-center gap-6 text-xs uppercase tracking-wider text-zinc-400">
+      <a href="index.html" class="hover:text-white transition-colors">Home</a>
+      <a href="organizer-dashboard.html" id="organizerLink" class="hidden hover:text-white transition-colors">Organizer</a>
+      <a href="attendee.html"            id="attendeeLink"  class="hidden hover:text-white transition-colors">My Tickets</a>
+      <button id="loginBtn" class="text-xs uppercase tracking-wider hover:text-white transition-colors">Login</button>
+      <div class="relative">
+        <button id="profileBtn"
+          class="hidden w-8 h-8 rounded-full bg-zinc-900 border border-white/10
+                 flex items-center justify-center hover:border-white/30 transition text-xs font-semibold text-white">
+        </button>
+        <div id="profileDropdown"
+          class="hidden absolute right-0 mt-2 w-56 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-lg z-50">
+          <div class="px-4 py-3 border-b border-white/10">
+            <p class="text-sm font-medium" id="profileName">User Name</p>
+            <p class="text-xs text-zinc-400" id="profileEmail">user@email.com</p>
+          </div>
+          <div class="py-1">
+            <a href="organizer-dashboard.html" id="dropdownOrganizerLink" class="block px-4 py-2 text-sm hover:bg-white/5">Organizer Dashboard</a>
+            <a href="attendee.html"            id="dropdownAttendeeLink"  class="block px-4 py-2 text-sm hover:bg-white/5">My Tickets</a>
+            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="pt-16">
+  <div class="max-w-7xl mx-auto px-6" style="padding-top:48px;padding-bottom:28px;">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+      <div>
+        <p class="text-xs uppercase tracking-widest text-indigo-400 font-semibold mb-2">Browse · Discover · Attend</p>
+        <h1 class="text-4xl font-bold tracking-tight mb-1">Upcoming Events</h1>
+        <p id="eventCountLabel" class="text-zinc-500 text-sm">Loading events…</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <!-- Search -->
+        <div class="relative">
+          <iconify-icon icon="lucide:search" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" width="14"></iconify-icon>
+          <input id="searchInput" type="text" placeholder="Search events…" class="search-input">
+          <div id="searchSuggestions"
+            class="hidden absolute top-full mt-1 w-full bg-zinc-900 border border-white/10 rounded-lg shadow-xl z-40 overflow-hidden">
+          </div>
+        </div>
+        <!-- Filter -->
+        <div class="relative">
+          <button onclick="toggleElement('filterDropdown')"
+            class="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <iconify-icon icon="lucide:sliders-horizontal" width="15" class="text-zinc-400"></iconify-icon>
+          </button>
+          <div id="filterDropdown"
+            class="hidden absolute right-0 top-full mt-2 w-64 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl p-4 z-30">
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-xs font-semibold text-white">Filters</span>
+              <button type="button" onclick="event.stopPropagation(); resetFilters();"
+                class="text-[10px] text-zinc-500 hover:text-white">Reset</button>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <label class="text-[10px] uppercase text-zinc-500 font-bold tracking-wider mb-2 block">Category</label>
+                <div id="categoryFilters" class="space-y-2"></div>
+              </div>
+              <div>
+                <label class="text-[10px] uppercase text-zinc-500 font-bold tracking-wider mb-2 block">Price Range</label>
+                <div class="flex items-center gap-2">
+                  <input id="filterMinPrice" type="number" placeholder="Min"
+                    class="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-white"/>
+                  <span class="text-zinc-600">–</span>
+                  <input id="filterMaxPrice" type="number" placeholder="Max"
+                    class="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-white"/>
+                </div>
+              </div>
+              <button onclick="event.stopPropagation(); applyFiltersFromUI();" type="button"
+                class="w-full py-1.5 bg-white text-black text-xs font-semibold rounded hover:bg-zinc-200 transition-colors mt-2">
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Category tabs -->
+    <div class="flex gap-2 flex-wrap" id="categoryTabs">
+      <button class="cat-tab active" data-cat="">All Events</button>
+      <button class="cat-tab" data-cat="Music">Music & Arts</button>
+      <button class="cat-tab" data-cat="Tech">Tech & Business</button>
+    </div>
+  </div>
+</div>
+
+<!-- GRID -->
+<main class="max-w-7xl mx-auto px-6 pb-24">
+  <div id="eventsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+</main>
+
+<!-- TICKET MODAL -->
+<div id="ticketModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTicketModal()"></div>
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="p-6 border-b border-white/10 relative overflow-hidden">
+        <div class="absolute inset-0 z-0">
+          <img class="event-image-bg w-full h-full object-cover opacity-20 blur-sm" src="">
+          <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent"></div>
+        </div>
+        <div class="relative z-10">
+          <div id="privateEventBadge" class="hidden inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-full mb-2">
+            <iconify-icon icon="lucide:lock" width="10" class="text-indigo-400"></iconify-icon>
+            <span class="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider">Private Event</span>
+          </div>
+          <h2 class="text-xl font-bold text-white tracking-tight event-title">Event Name</h2>
+          <p class="text-indigo-400 text-sm mt-1">
+            <span class="event-date-short">Oct 12</span> • <span class="event-time-short">08:00 PM</span>
+          </p>
+          <p class="text-zinc-400 text-xs mt-0.5 event-location">Location</p>
+        </div>
+      </div>
+      <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4 ticket-tiers-container"></div>
+      <div class="p-6 border-t border-white/10 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-zinc-500 uppercase tracking-wider">Total</p>
+          <p class="text-xl font-bold font-mono text-white" id="modalTotal">₦0</p>
+        </div>
+        <button id="confirmBookingBtn" disabled
+          class="px-6 py-3 bg-zinc-700 text-zinc-400 rounded-xl text-sm font-bold cursor-not-allowed transition-colors flex items-center gap-2">
+          Confirm Booking
+          <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+
+/* ── Nav ── */
+const profileBtn      = document.getElementById("profileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+const loginBtn        = document.getElementById("loginBtn");
+const logoutBtn       = document.getElementById("logoutBtn");
+
+if (profileBtn) profileBtn.addEventListener("click", e => { e.stopPropagation(); profileDropdown.classList.toggle("hidden"); });
+if (loginBtn)   loginBtn.addEventListener("click", () => { window.location.href = "index.html#login"; });
+if (logoutBtn)  logoutBtn.addEventListener("click", logout);
+
+document.addEventListener("click", e => {
+  if (!e.target.closest("#profileBtn")) profileDropdown?.classList.add("hidden");
+  if (!e.target.closest("#filterDropdown") && !e.target.closest("[onclick*='filterDropdown']"))
+    document.getElementById("filterDropdown")?.classList.add("hidden");
+});
+
+/* ── Countdown ── */
+const pad = n => String(n).padStart(2, "0");
+
+function buildCountdownHTML(isoDate) {
+  const diff = new Date(isoDate).getTime() - Date.now();
+  if (diff <= 0) return `<span class="live-badge"><span class="live-dot"></span>Live Now</span>`;
+  const days  = pad(Math.floor(diff / 86400000));
+  const hours = pad(Math.floor((diff / 3600000) % 24));
+  const mins  = pad(Math.floor((diff / 60000) % 60));
+  return `<div class="countdown-strip">
+    <div class="countdown-unit"><span class="countdown-num">${days}</span><span class="countdown-lbl">Days</span></div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit"><span class="countdown-num">${hours}</span><span class="countdown-lbl">Hrs</span></div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit"><span class="countdown-num">${mins}</span><span class="countdown-lbl">Min</span></div>
+  </div>`;
+}
+
+function startCountdownTimers() {
+  function tick() {
+    document.querySelectorAll(".countdown-timer").forEach(el => {
+      el.innerHTML = buildCountdownHTML(el.dataset.start);
+    });
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+document.addEventListener("DOMContentLoaded", startCountdownTimers);
+
+/* ── Data layer ── */
+const API_URL = "https://entriqs-backend.onrender.com";
+
+let cachedEvents = [];
+
+async function loadEventsFromAPI() {
+  try {
+    const res  = await fetch(`${API_URL}/api/events`);
+    const data = await res.json();
+    cachedEvents = data.events || [];
+
+    console.log("First raw event from API:", JSON.stringify(cachedEvents[0], null, 2));
+
+    renderWithFiltersAndSearch();
+  } catch (err) {
+    console.error("Failed to load events", err);
+  }
+}
+
+function getAllEvents() {
+  return cachedEvents;
+}
+
+function getEventByIdFromStorage(eventId) {
+  return cachedEvents.find(e => e.id === eventId) || null;
+}
+
+/* ── Filters state ── */
+function getSavedFilters() {
+  try { return JSON.parse(localStorage.getItem("eventFilters")) || { category: null, minPrice: null, maxPrice: null }; }
+  catch { return { category: null, minPrice: null, maxPrice: null }; }
+}
+function saveFilters(f) { localStorage.setItem("eventFilters", JSON.stringify(f)); }
+function getSavedSearch() { return sessionStorage.getItem("eventSearch") || ""; }
+function saveSearch(v)    { sessionStorage.setItem("eventSearch", v); }
+
+/* ── Normalize ── */
+function getEventStartingPrice(event) {
+  if (!event.tickets || !event.tickets.length) return "Free";
+  const prices = event.tickets.map(t => Number(t.price)).filter(p => !isNaN(p) && p > 0);
+  if (!prices.length) return "Free";
+  return `₦${Math.min(...prices).toLocaleString()}`;
+}
+
+function resolveOrganizerIdentity(event) {
+  console.log("event fields:", event.organization_name, event.organizerOrganization);
+  if (event.organization_name) return event.organization_name;
+  if (event.organizerOrganization) return event.organizerOrganization;
+  if (event.organizer && event.organizer !== "Organizer") return event.organizer;
+  try {
+    const session = JSON.parse(localStorage.getItem("userSession"));
+    const user = session?.user;
+    if (user && user.id === (event.organizer_id || event.organizerId))
+      return user.organizationName || `${user.firstName||""} ${user.lastName||""}`.trim() || "Organizer";
+  } catch {}
+  return "Organizer";
+}
+
+function normalizeEvent(event) {
+  return {
+    id:          event.id || crypto.randomUUID(),
+    title:       event.name || event.title || "Untitled Event",
+    organizer:   resolveOrganizerIdentity(event),
+    organization_name: event.organization_name || null,
+    description: event.description || event.details || "",
+    category:    event.category || "General",
+    visibility:  event.eventType === "private" ? "Private" : "Public",
+    image: event.image_url || event.imageUrl || event.image || "",
+    startDate: event.event_date || event.date || event.startDate || new Date().toISOString(),
+    location:    event.location || "TBA",
+    price:       getEventStartingPrice(event),
+    tickets:     event.tickets || [],
+    format:      event.eventFormat === "online" ? "Online" : "In-Person"
+  };
+}
+
+const EVENT_CATEGORIES = [
+  { id: "music", label: "Music & Arts",    value: "Music" },
+  { id: "tech",  label: "Tech & Business", value: "Tech"  }
+];
+
+function renderCategoryFilters() {
+  const container = document.getElementById("categoryFilters");
+  if (!container) return;
+  container.innerHTML = "";
+  EVENT_CATEGORIES.forEach(cat => {
+    container.insertAdjacentHTML("beforeend", `
+      <div class="flex items-center gap-2">
+        <input id="filter-${cat.id}" type="checkbox" value="${cat.value}" class="filter-category hidden"/>
+        <label for="filter-${cat.id}" class="flex items-center gap-2 cursor-pointer group">
+          <div class="w-4 h-4 rounded border border-zinc-700 flex items-center justify-center group-hover:border-zinc-500 transition-colors">
+            <iconify-icon icon="lucide:check" class="text-white opacity-0 input-check" width="12"></iconify-icon>
+          </div>
+          <span class="text-xs text-zinc-300">${cat.label}</span>
+        </label>
+      </div>`);
+  });
+}
+
+/* ── Filter engine ── */
+function applyFilters(events) {
+  const filters     = getSavedFilters();
+  const searchQuery = getSavedSearch().toLowerCase();
+  const activeTab   = document.querySelector(".cat-tab.active")?.dataset.cat || "";
+
+  return events.filter(event => {
+    if (event.visibility !== "Public") return false;
+    if (event.status === "draft") return false;
+    if (activeTab && !event.category.toLowerCase().includes(activeTab.toLowerCase())) return false;
+    if (searchQuery) {
+      const hay = `${event.title} ${event.organizer} ${event.category}`.toLowerCase();
+      if (!hay.includes(searchQuery)) return false;
+    }
+    if (filters.category && !event.category.toLowerCase().includes(filters.category.toLowerCase())) return false;
+    const price = event.price === "Free" ? 0 : Number(String(event.price).replace(/[₦,]/g, ""));
+    if (filters.minPrice !== null && price < filters.minPrice) return false;
+    if (filters.maxPrice !== null && price > filters.maxPrice) return false;
+    return true;
+  });
+}
+
+function applyFiltersFromUI() {
+  saveFilters({
+    category: document.querySelector(".filter-category:checked")?.value || null,
+    minPrice: document.getElementById("filterMinPrice")?.value ? Number(document.getElementById("filterMinPrice").value) : null,
+    maxPrice: document.getElementById("filterMaxPrice")?.value ? Number(document.getElementById("filterMaxPrice").value) : null,
+  });
+  renderWithFiltersAndSearch();
+  toggleElement("filterDropdown");
+}
+
+function resetFilters() {
+  localStorage.removeItem("eventFilters");
+  document.querySelectorAll(".filter-category").forEach(i => i.checked = false);
+  document.querySelectorAll(".input-check").forEach(i => i.classList.remove("opacity-100"));
+  document.getElementById("filterMinPrice").value = "";
+  document.getElementById("filterMaxPrice").value = "";
+  renderWithFiltersAndSearch();
+}
+
+/* ── Format date ── */
+function formatEventDate(isoDate) {
+  const d = new Date(isoDate);
+  return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })
+    + " · " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+}
+
+/* ── Render card ── */
+function renderEventCard(event, index) {
+  const isLive  = new Date(event.startDate).getTime() <= Date.now();
+  const isOnline = event.format === "Online";
+  const delay   = Math.min(index * 0.07, 0.5);
+
+  const visibilityBadge = event.visibility === "Private"
+    ? `<span class="badge badge-private"><iconify-icon icon="lucide:lock" width="9"></iconify-icon> Private</span>`
+    : `<span class="badge badge-public">Public</span>`;
+
+  const imagePart = event.image
+    ? `<img src="${event.image}" alt="${event.title}" loading="lazy">`
+    : `<div class="card-image-fallback"><iconify-icon icon="lucide:calendar" width="40" class="text-zinc-700"></iconify-icon></div>`;
+
+  const liveStyle = isLive ? `style="border-color: rgba(0,255,180,0.25);"` : "";
+
+  return `
+  <div class="event-card card-animate" style="animation-delay:${delay}s; ${liveStyle.replace('style="','').replace('"','')}"
+       onclick="window.location.href='event-detail.html?id=${event.id}'">
+
+    ${isLive ? `
+    <div style="position:absolute;top:12px;left:12px;z-index:10;display:flex;align-items:center;gap:6px;
+                padding:3px 10px;background:rgba(0,255,180,0.12);border:1px solid rgba(0,255,180,0.35);
+                border-radius:999px;pointer-events:none;">
+      <span class="live-dot"></span>
+      <span style="font-size:10px;font-weight:700;color:#00ffb4;letter-spacing:.1em;text-transform:uppercase;">Live</span>
+    </div>` : ""}
+
+    <div class="card-image">
+      ${imagePart}
+      <div class="card-image-overlay">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="badge badge-category">${event.category}</span>
+          ${visibilityBadge}
+        </div>
+        <h3 style="font-size:16px;font-weight:700;line-height:1.25;color:white;margin:0 0 3px;">
+          ${event.title}
+        </h3>
+        <p style="font-size:11px;color:rgba(255,255,255,0.5);margin:0;">By ${event.organizer}</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:rgba(255,255,255,0.4);">
+        <span style="display:flex;align-items:center;gap:4px;">
+          <iconify-icon icon="lucide:calendar" width="11"></iconify-icon>
+          ${formatEventDate(event.startDate)}
+        </span>
+        <span style="display:flex;align-items:center;gap:4px;">
+          <iconify-icon icon="lucide:${isOnline ? "monitor" : "map-pin"}" width="11"></iconify-icon>
+          ${isOnline ? "Online" : event.location}
+        </span>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;">
+        <div>
+          ${!isLive ? `<p style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;">Starts in</p>` : ""}
+          <div class="countdown-timer" data-start="${event.startDate}"></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <p style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">From</p>
+          <p style="font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:white;">${event.price}</p>
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <button class="view-btn ${isLive ? "view-btn-live" : ""}"
+              onclick="event.stopPropagation(); window.location.href='event-detail.html?id=${event.id}'">
+        ${isLive ? "Join Now" : "View Event"}
+        <iconify-icon icon="lucide:arrow-right" width="13"></iconify-icon>
+      </button>
+    </div>
+  </div>`;
+}
+
+/* ── Render grid ── */
+function renderWithFiltersAndSearch() {
+  const grid = document.getElementById("eventsGrid");
+  if (!grid) return;
+
+  const normalized = cachedEvents
+    .filter(e => e.status !== "draft")
+    .map(normalizeEvent);
+
+  const visible = applyFilters(normalized);
+
+  const label = document.getElementById("eventCountLabel");
+  if (label) label.textContent = visible.length === 0
+    ? "No events found"
+    : `${visible.length} event${visible.length !== 1 ? "s" : ""} available`;
+
+  grid.innerHTML = "";
+
+  if (!visible.length) {
+    grid.innerHTML = `
+      <div class="col-span-full text-center py-20">
+        <iconify-icon icon="lucide:calendar-x" width="40" class="text-zinc-700 mb-4 block mx-auto"></iconify-icon>
+        <p class="text-zinc-500 text-sm">No events match your search.</p>
+      </div>`;
+    return;
+  }
+
+  visible.forEach((event, i) => {
+    grid.insertAdjacentHTML("beforeend", renderEventCard(event, i));
+  });
+
+  startCountdownTimers();
+}
+
+/* ── Init ── */
+document.addEventListener("DOMContentLoaded", () => {
+  renderCategoryFilters();
+  attachCategoryFilterLogic();
+  loadEventsFromAPI();
+
+  document.getElementById("categoryTabs")?.addEventListener("click", e => {
+    const tab = e.target.closest(".cat-tab");
+    if (!tab) return;
+    document.querySelectorAll(".cat-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    renderWithFiltersAndSearch();
+  });
+
+  handleSharedEventLink();
+});
+
+/* ── Search ── */
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+  searchInput.value = getSavedSearch();
+  searchInput.addEventListener("input", e => { saveSearch(e.target.value.trim()); renderWithFiltersAndSearch(); });
+  searchInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); renderWithFiltersAndSearch(); } });
+}
+
+function renderSearchSuggestions(query) {
+  const box = document.getElementById("searchSuggestions");
+  if (!box || !query) { box?.classList.add("hidden"); return; }
+  const matches = getAllEvents().map(normalizeEvent).filter(e => e.title.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+  if (!matches.length) { box.classList.add("hidden"); return; }
+  box.innerHTML = matches.map(e => `
+    <button class="w-full text-left px-4 py-2 text-sm hover:bg-white/5"
+      onclick="selectSearchSuggestion('${e.title.replace(/'/g,"\\'")}')">
+      ${e.title}
+    </button>`).join("");
+  box.classList.remove("hidden");
+}
+
+function selectSearchSuggestion(value) {
+  saveSearch(value);
+  document.getElementById("searchInput").value = value;
+  document.getElementById("searchSuggestions").classList.add("hidden");
+  renderWithFiltersAndSearch();
+}
+
+/* ── Modal ── */
+let selectedEvent   = null;
+let ticketQuantities = {};
+let selectedTiers   = [];
+
+function openTicketModal(event) {
+  selectedEvent = event;
+  populateTicketModal(event);
+  document.getElementById("ticketModal").classList.remove("hidden");
+}
+function closeTicketModal() {
+  document.getElementById("ticketModal").classList.add("hidden");
+  selectedEvent = null; selectedTiers = [];
+}
+
+function populateTicketModal(event) {
+  const modal = document.getElementById("ticketModal");
+  ticketQuantities = {}; selectedTiers = [];
+  modal.querySelector(".event-title").textContent = event.title;
+  const badge = document.getElementById("privateEventBadge");
+  event.visibility === "Private" ? badge.classList.remove("hidden") : badge.classList.add("hidden");
+  modal.querySelector(".event-image-bg").src = event.image || "";
+  const start = new Date(event.startDate);
+  modal.querySelector(".event-date-short").textContent = start.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  modal.querySelector(".event-time-short").textContent = start.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  modal.querySelector(".event-location").textContent = event.format === "Online" ? "Online Event" : event.location;
+  const container = document.querySelector(".ticket-tiers-container");
+  container.innerHTML = "";
+  if (!event.tickets || !event.tickets.length) {
+    container.innerHTML = `<div class="text-center py-8 text-zinc-400 text-sm">No tickets available.</div>`;
+    updateModalTotal(); return;
+  }
+  event.tickets.forEach((tier, index) => {
+    const remaining = tier.quantity - (tier.sold || 0);
+    const isSoldOut  = remaining <= 0;
+    const isLowStock = remaining > 0 && remaining <= 10;
+    const isVIP = index > 0;
+    ticketQuantities[index] = 0;
+    container.insertAdjacentHTML("beforeend", `
+      <div class="p-4 rounded-xl border ${isSoldOut ? "border-white/10 bg-white/5 opacity-50" : isVIP ? "border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10" : "border-white/10 bg-white/5 hover:border-white/20"} transition-all flex items-center justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-semibold ${isVIP ? "text-indigo-200" : "text-white"}">${tier.name}</h3>
+            ${isLowStock && !isSoldOut ? '<span class="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded border border-white/5">Selling Fast</span>' : ""}
+            ${isSoldOut ? '<span class="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">Sold Out</span>' : ""}
+            ${isVIP ? '<iconify-icon icon="lucide:star" class="text-indigo-400 text-xs"></iconify-icon>' : ""}
+          </div>
+          <p class="text-xs text-zinc-500 mt-1">${remaining} tickets available</p>
+          <div class="mt-2 font-mono text-sm text-white">₦${Number(tier.price).toLocaleString()}</div>
+        </div>
+        <div class="flex items-center gap-3 bg-black/40 rounded-lg p-1 border border-white/10">
+          <button ${isSoldOut ? "disabled" : ""} onclick="updateTicketQuantity(${index}, -1)"
+            class="w-7 h-7 rounded ${isSoldOut ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-zinc-800 text-white hover:bg-zinc-700"} flex items-center justify-center transition-colors">
+            <iconify-icon icon="lucide:minus" width="14"></iconify-icon>
+          </button>
+          <span class="text-sm font-mono w-4 text-center ${isSoldOut ? "text-zinc-500" : ""}" id="qty-${index}">0</span>
+          <button ${isSoldOut ? "disabled" : ""} onclick="updateTicketQuantity(${index}, 1)"
+            class="w-7 h-7 rounded ${isSoldOut ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-white text-black hover:bg-zinc-200"} flex items-center justify-center transition-colors">
+            <iconify-icon icon="lucide:plus" width="14"></iconify-icon>
+          </button>
+        </div>
+      </div>`);
+  });
+  updateModalTotal();
+}
+
+function openTicketModalById(eventId) {
+  const raw = getAllEvents().find(e => e.id === eventId);
+  if (raw) openTicketModal(normalizeEvent(raw));
+}
+
+function updateTicketQuantity(tierIndex, change) {
+  const tier = selectedEvent.tickets[tierIndex];
+  const remaining = tier.quantity - (tier.sold || 0);
+  let newQty = ticketQuantities[tierIndex] + change;
+  if (newQty < 0) newQty = 0;
+  if (newQty > remaining) { alert(`Only ${remaining} tickets available for ${tier.name}`); return; }
+  if (newQty > 10) { alert("Maximum 10 tickets per tier"); return; }
+  ticketQuantities[tierIndex] = newQty;
+  document.getElementById(`qty-${tierIndex}`).textContent = newQty;
+  selectedTiers = Object.keys(ticketQuantities).filter(k => ticketQuantities[k] > 0)
+    .map(k => ({ tier: selectedEvent.tickets[k], quantity: ticketQuantities[k] }));
+  updateModalTotal();
+}
+
+function updateModalTotal() {
+  const total = selectedTiers.reduce((s, i) => s + i.tier.price * i.quantity, 0);
+  const isFree = total === 0 && selectedTiers.length > 0;
+
+  document.getElementById("modalTotal").textContent = isFree ? "Free" : `₦${total.toLocaleString()}`;
+
+  const btn = document.getElementById("confirmBookingBtn");
+  if (selectedTiers.length > 0) {
+    btn.disabled = false;
+    btn.classList.remove("bg-zinc-700", "text-zinc-400", "cursor-not-allowed");
+    btn.classList.add("bg-white", "text-black", "hover:bg-zinc-200");
+    btn.innerHTML = isFree
+      ? `Register Free <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>`
+      : `Confirm Booking <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>`;
+  } else {
+    btn.disabled = true;
+    btn.classList.add("bg-zinc-700", "text-zinc-400", "cursor-not-allowed");
+    btn.classList.remove("bg-white", "text-black", "hover:bg-zinc-200");
+    btn.innerHTML = `Confirm Booking <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>`;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const confirmBtn = document.getElementById("confirmBookingBtn");
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", () => {
+      if (!selectedEvent || !selectedTiers.length) { alert("Please select at least one ticket"); return; }
+      sessionStorage.setItem("checkoutData", JSON.stringify({ event: selectedEvent, selectedTiers }));
+      window.location.href = "checkout.html";
+    });
+  }
+});
+
+/* ── Shared link ── */
+function handleSharedEventLink() {
+  const hash = window.location.hash;
+  if (hash.startsWith("#event/")) window.location.href = `event-detail.html?id=${hash.replace("#event/", "")}`;
+}
+window.addEventListener("hashchange", handleSharedEventLink);
+
+/* ── Helpers ── */
+function toggleElement(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle("hidden");
+}
+
+function attachCategoryFilterLogic() {
+  document.querySelectorAll(".filter-category").forEach(input => {
+    input.addEventListener("change", () => {
+      document.querySelectorAll(".filter-category").forEach(o => { if (o !== input) o.checked = false; });
+      document.querySelectorAll("#categoryFilters .input-check").forEach(i => i.classList.remove("opacity-100"));
+      if (input.checked) input.parentElement.querySelector(".input-check").classList.add("opacity-100");
+    });
+  });
+}
+</script>
+</body>
+</html>

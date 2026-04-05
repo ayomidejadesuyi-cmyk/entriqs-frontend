@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details – Entriqs</title>
+
+  <script>
+    window.PAGE_MODE = "public";
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<style>
+  /* ── Countdown (same as events.html) ── */
+  .countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  .countdown div {
+    position: relative;
+    width: 48px;
+    text-align: center;
+  }
+  .countdown strong {
+    display: inline-block;
+    width: 2ch;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .countdown span {
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .countdown div:not(:last-child)::after {
+    content: ":";
+    position: absolute;
+    right: -12px;
+    top: 2px;
+    font-size: 18px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* ── Hero ── */
+  .hero-bg {
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* ── Ticket tier hover ── */
+  .tier-card {
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+  .tier-card:hover:not(.sold-out) {
+    border-color: rgba(255,255,255,0.25);
+  }
+
+  /* ── Sticky booking sidebar ── */
+  @media (min-width: 1024px) {
+    .booking-sidebar {
+      position: sticky;
+      top: 88px;
+    }
+  }
+
+  /* ── Fade-in animation ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up {
+    animation: fadeUp 0.4s ease-out both;
+  }
+  .fade-up-delay-1 { animation-delay: 0.08s; }
+  .fade-up-delay-2 { animation-delay: 0.16s; }
+  .fade-up-delay-3 { animation-delay: 0.24s; }
+
+  /* ── Toast ── */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<body class="bg-[#050505] text-white min-h-screen">
+
+  <!-- ═══════════════════════════════════
+       NAV  (mirrors events.html exactly)
+  ════════════════════════════════════ -->
+  <nav class="fixed top-0 w-full z-50 bg-black/60 backdrop-blur border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+      <a href="index.html" class="flex gap-2 items-center">
+        <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-sm">EN</div>
+        <span class="hidden sm:block font-semibold tracking-tight">ENTRIQS</span>
+      </a>
+
+      <div class="flex items-center gap-6 text-xs uppercase tracking-wider text-zinc-400">
+        <a href="index.html" class="hover:text-white transition-colors">Home</a>
+        <a href="events.html" class="hover:text-white transition-colors">Explore</a>
+
+        <a href="organizer-dashboard.html" id="organizerLink" class="hidden hover:text-white transition-colors">Organizer</a>
+        <a href="attendee.html"            id="attendeeLink"  class="hidden hover:text-white transition-colors">My Tickets</a>
+
+        <button id="loginBtn" class="text-xs uppercase tracking-wider hover:text-white transition-colors">Login</button>
+
+        <!-- Profile dropdown -->
+        <div class="relative">
+          <button id="profileBtn"
+            class="hidden w-8 h-8 rounded-full bg-zinc-900 border border-white/10
+                   flex items-center justify-center hover:border-white/30 transition text-xs font-semibold text-white">
+          </button>
+          <div id="profileDropdown"
+            class="hidden absolute right-0 mt-2 w-56 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-lg z-50">
+            <div class="px-4 py-3 border-b border-white/10">
+              <p class="text-sm font-medium" id="profileName">User Name</p>
+              <p class="text-xs text-zinc-400"  id="profileEmail">user@email.com</p>
+            </div>
+            <div class="py-1">
+              <a href="organizer-dashboard.html" class="block px-4 py-2 text-sm hover:bg-white/5">Organizer Dashboard</a>
+              <a href="attendee.html"            class="block px-4 py-2 text-sm hover:bg-white/5">My Tickets</a>
+              <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════
+       LOADING STATE  (shown until JS runs)
+  ════════════════════════════════════ -->
+  <div id="loadingState" class="pt-16 min-h-screen flex items-center justify-center">
+    <div class="text-center space-y-3">
+      <div class="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
+      <p class="text-xs text-zinc-500 uppercase tracking-wider">Loading event</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       ERROR STATE  (shown if event not found)
+  ════════════════════════════════════ -->
+  <div id="errorState" class="hidden pt-16 min-h-screen flex items-center justify-center px-6">
+    <div class="text-center max-w-md space-y-4">
+      <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto">
+        <iconify-icon icon="lucide:calendar-x" width="28" class="text-red-400"></iconify-icon>
+      </div>
+      <h2 class="text-xl font-semibold">Event Not Found</h2>
+      <p class="text-sm text-zinc-400">This event may have been removed or the link is invalid.</p>
+      <a href="events.html"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black text-sm font-semibold rounded-lg hover:bg-zinc-200 transition-colors">
+        <iconify-icon icon="lucide:arrow-left" width="14"></iconify-icon>
+        Browse Events
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       MAIN CONTENT  (hidden until JS populates it)
+  ════════════════════════════════════ -->
+  <div id="pageContent" class="hidden">
+
+    <!-- ── HERO BANNER ── -->
+    <div id="heroBanner" class="relative w-full h-[420px] bg-zinc-900 overflow-hidden">
+      <!-- Background image (set by JS) -->
+      <div id="heroBg" class="absolute inset-0 hero-bg scale-105"
+           style="filter: brightness(0.45) saturate(1.1);">
+      </div>
+      <!-- Gradient overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent"></div>
+
+      <!-- Back button -->
+      <div class="absolute top-20 left-6 z-10">
+        <a href="events.html"
+          class="inline-flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur border border-white/10
+                 rounded-full text-xs text-zinc-300 hover:text-white hover:border-white/30 transition-colors">
+          <iconify-icon icon="lucide:arrow-left" width="12"></iconify-icon>
+          All Events
+        </a>
+      </div>
+
+      <!-- Badges pinned to bottom-left of hero -->
+      <div class="absolute bottom-8 left-6 right-6 z-10 flex flex-wrap gap-2" id="heroBadges">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- ── PAGE BODY ── -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        <!-- ── LEFT: Event Details ── -->
+        <div class="lg:col-span-7 space-y-8 fade-up">
+
+          <!-- Title block -->
+          <div class="space-y-3">
+            <h1 id="eventTitle" class="text-3xl md:text-4xl font-bold tracking-tight leading-tight"></h1>
+            <p id="eventOrganizer" class="text-sm text-zinc-400"></p>
+          </div>
+
+          <!-- Meta row: date / location / format -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 fade-up fade-up-delay-1">
+
+            <div class="flex items-start gap-3 p-4 rounded-xl bg-zinc-900/60 border border-white/5">
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
+                <iconify-icon icon="lucide:calendar" width="16" class="text-indigo-400"></iconify-icon>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-zinc-500 mb-0.5">Date</p>
+                <p id="eventDate" class="text-sm font-medium text-white"></p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-4 rounded-xl bg-zinc-900/60 border border-white/5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                <iconify-icon icon="lucide:clock" width="16" class="text-emerald-400"></iconify-icon>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-zinc-500 mb-0.5">Time</p>
+                <p id="eventTime" class="text-sm font-medium text-white"></p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-4 rounded-xl bg-zinc-900/60 border border-white/5">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                <iconify-icon id="locationIcon" icon="lucide:map-pin" width="16" class="text-amber-400"></iconify-icon>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-zinc-500 mb-0.5">Location</p>
+                <p id="eventLocation" class="text-sm font-medium text-white"></p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Countdown -->
+          <div class="fade-up fade-up-delay-2">
+            <p class="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Event starts in</p>
+            <div class="inline-block bg-zinc-900/80 border border-white/5 rounded-xl px-8 py-5">
+              <div id="detailCountdown" class="countdown-timer" data-start=""></div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="fade-up fade-up-delay-3 space-y-3">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400">About this event</h2>
+            <p id="eventDescription"
+               class="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ── RIGHT: Booking Sidebar ── -->
+        <div class="lg:col-span-5">
+          <div class="booking-sidebar space-y-4 fade-up fade-up-delay-1">
+
+            <!-- Sidebar header -->
+            <div class="p-5 rounded-2xl border border-white/10 bg-zinc-900/60 backdrop-blur space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold">Select Tickets</h3>
+                <span id="sidebarPrice" class="text-xs text-zinc-400 font-mono"></span>
+              </div>
+
+              <!-- Ticket tiers — populated by JS -->
+              <div id="ticketTiersContainer" class="space-y-3">
+                <!-- JS fills this in -->
+              </div>
+
+              <!-- Total + CTA -->
+              <div class="pt-4 border-t border-white/10 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-zinc-500 uppercase tracking-wider">Total</span>
+                  <span id="bookingTotal" class="text-lg font-bold font-mono">₦0</span>
+                </div>
+                <button id="bookNowBtn"
+                  disabled
+                  class="w-full py-3 bg-zinc-700 text-zinc-400 rounded-xl text-sm font-bold
+                         cursor-not-allowed transition-all flex items-center justify-center gap-2">
+                  Select a ticket to continue
+                  <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Private event notice (hidden by default) -->
+            <div id="privateNotice"
+              class="hidden p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 flex items-start gap-3">
+              <iconify-icon icon="lucide:lock" width="16" class="text-indigo-400 mt-0.5 shrink-0"></iconify-icon>
+              <p class="text-xs text-indigo-300 leading-relaxed">
+                This is a private event. Only people with the link can view and book tickets.
+              </p>
+            </div>
+
+            <!-- Share strip -->
+            <div class="p-4 rounded-xl border border-white/5 bg-zinc-900/40 flex items-center justify-between">
+              <p class="text-xs text-zinc-500">Share this event</p>
+              <div class="flex gap-2">
+                <button onclick="shareViaWhatsApp()"
+                  class="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center hover:bg-green-500/20 transition-colors"
+                  title="Share on WhatsApp">
+                  <iconify-icon icon="lucide:message-circle" width="14" class="text-green-400"></iconify-icon>
+                </button>
+                <button onclick="shareViaEmail()"
+                  class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center hover:bg-blue-500/20 transition-colors"
+                  title="Share via Email">
+                  <iconify-icon icon="lucide:mail" width="14" class="text-blue-400"></iconify-icon>
+                </button>
+                <button onclick="copyPageLink()"
+                  class="w-8 h-8 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-zinc-700 transition-colors"
+                  title="Copy link">
+                  <iconify-icon icon="lucide:link" width="14" class="text-zinc-400"></iconify-icon>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div><!-- /pageContent -->
+
+
+  <!-- ═══════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════ -->
+  <script src="auth.js"></script>
+
+  <script>
+    /* ─────────────────────────────────
+       NAV wiring (same pattern as events.html)
+    ───────────────────────────────── */
+    const profileBtn      = document.getElementById("profileBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+    const loginBtn        = document.getElementById("loginBtn");
+    const logoutBtn       = document.getElementById("logoutBtn");
+
+    if (profileBtn) {
+      profileBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle("hidden");
+      });
+    }
+    if (loginBtn) {
+      loginBtn.addEventListener("click", () => { window.location.href = "index.html#login"; });
+    }
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => logout());
+    }
+    document.addEventListener("click", e => {
+      if (!e.target.closest("#profileBtn")) profileDropdown?.classList.add("hidden");
+    });
+
+
+    /* ─────────────────────────────────
+       DATA HELPERS
+       (same localStorage logic as events.html)
+    ───────────────────────────────── */
+
+    function getEventByIdFromStorage(eventId) {
+      try {
+        const raw = localStorage.getItem("entriqs_events");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed) && typeof parsed === "object") return parsed[eventId] || null;
+        if (Array.isArray(parsed)) return parsed.find(e => e.id === eventId) || null;
+        return null;
+      } catch { return null; }
+    }
+
+    function getEventStartingPrice(event) {
+      if (!event.tickets || event.tickets.length === 0) return "Free";
+      const prices = event.tickets.map(t => Number(t.price)).filter(p => !isNaN(p) && p > 0);
+      if (prices.length === 0) return "Free";
+      return `₦${Math.min(...prices).toLocaleString()}`;
+    }
+
+    function resolveOrganizerIdentity(event) {
+      if (event.organization_name) return event.organization_name;
+      if (event.organizer && event.organizer !== "Organizer") return event.organizer;
+      if (event.organizerOrganization) return event.organizerOrganization;
+      try {
+        const session = JSON.parse(localStorage.getItem("userSession"));
+        const user = session?.user;
+        if (user && user.id === (event.organizer_id || event.organizerId)) {
+          return user.organizationName ||
+            `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Organizer";
+        }
+      } catch {}
+      return "Organizer";
+    }
+
+    function normalizeEvent(event) {
+      return {
+        id:          event.id || "",
+        title:       event.name || event.title || "Untitled Event",
+        organizer:   resolveOrganizerIdentity(event),
+        description: event.description || event.details || "",
+        category:    event.category || "General",
+        visibility:  (event.event_type || event.eventType) === "private" ? "Private" : "Public",
+        image:       event.image_url || event.imageUrl || event.image || "",
+        startDate:   event.event_date || event.date || event.startDate || new Date().toISOString(),
+        location:    event.location || "TBA",
+        price:       getEventStartingPrice(event),
+        tickets:     event.tickets || [],
+        format:      (event.event_format || event.eventFormat) === "online" ? "Online" : "In-Person"
+      };
+    }
+
+
+    /* ─────────────────────────────────
+       COUNTDOWN
+    ───────────────────────────────── */
+
+    const pad = n => String(n).padStart(2, "0");
+
+    function startCountdown(isoDate) {
+      const el = document.getElementById("detailCountdown");
+      el.dataset.start = isoDate;
+
+      function tick() {
+        const diff = new Date(isoDate).getTime() - Date.now();
+
+        if (diff <= 0) {
+          el.innerHTML = `<span class="text-[#00ffcc] text-base font-semibold tracking-wide">Live Now</span>`;
+          return;
+        }
+
+        const days  = pad(Math.floor(diff / (1000 * 60 * 60 * 24)));
+        const hours = pad(Math.floor((diff / (1000 * 60 * 60)) % 24));
+        const mins  = pad(Math.floor((diff / (1000 * 60)) % 60));
+        const secs  = pad(Math.floor((diff / 1000) % 60));
+
+        el.innerHTML = `
+          <div class="countdown">
+            <div><strong>${days}</strong><span>Days</span></div>
+            <div><strong>${hours}</strong><span>Hrs</span></div>
+            <div><strong>${mins}</strong><span>Mins</span></div>
+            <div><strong>${secs}</strong><span>Secs</span></div>
+          </div>`;
+      }
+
+      tick();
+      setInterval(tick, 1000);
+    }
+
+
+    /* ─────────────────────────────────
+       TICKET BOOKING STATE
+    ───────────────────────────────── */
+
+    let currentEvent    = null;
+    let ticketQtys      = {};   // { tierIndex: quantity }
+    let selectedTiers   = [];
+
+    function renderTicketTiers(event) {
+      const container = document.getElementById("ticketTiersContainer");
+      container.innerHTML = "";
+
+      if (!event.tickets || event.tickets.length === 0) {
+        container.innerHTML = `
+          <div class="py-6 text-center text-zinc-500 text-sm">
+            No tickets available for this event.
+          </div>`;
+        return;
+      }
+
+      event.tickets.forEach((tier, index) => {
+        const remaining  = tier.quantity - (tier.sold || 0);
+        const isSoldOut  = remaining <= 0;
+        const isLowStock = remaining > 0 && remaining <= 10;
+        const isVIP      = index > 0;
+
+        ticketQtys[index] = 0;
+
+        container.insertAdjacentHTML("beforeend", `
+          <div class="tier-card p-4 rounded-xl border ${
+            isSoldOut
+              ? "border-white/5 bg-white/[0.02] opacity-50 sold-out"
+              : isVIP
+                ? "border-indigo-500/20 bg-indigo-500/5"
+                : "border-white/10 bg-white/[0.03]"
+          }">
+            <div class="flex items-start justify-between gap-3">
+
+              <!-- Tier info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="text-sm font-semibold ${isVIP ? "text-indigo-200" : "text-white"} truncate">
+                    ${tier.name}
+                  </span>
+                  ${isVIP    ? `<iconify-icon icon="lucide:star" width="12" class="text-indigo-400"></iconify-icon>` : ""}
+                  ${isSoldOut  ? `<span class="text-[10px] bg-red-500/15 text-red-400 px-1.5 py-0.5 rounded border border-red-500/20">Sold Out</span>` : ""}
+                  ${isLowStock && !isSoldOut ? `<span class="text-[10px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/20">Only ${remaining} left</span>` : ""}
+                </div>
+                <p class="text-xs text-zinc-500">${remaining > 0 ? remaining + " available" : "No tickets left"}</p>
+                <p class="text-sm font-mono font-semibold text-white mt-2">
+                  ${Number(tier.price) === 0 ? "Free" : "₦" + Number(tier.price).toLocaleString()}
+                </p>
+              </div>
+
+              <!-- Qty stepper -->
+              <div class="flex items-center gap-2 bg-black/40 rounded-lg p-1 border border-white/10 shrink-0">
+                <button
+                  ${isSoldOut ? "disabled" : ""}
+                  onclick="changeQty(${index}, -1)"
+                  class="w-7 h-7 rounded flex items-center justify-center transition-colors
+                         ${isSoldOut ? "bg-zinc-800 text-zinc-600 cursor-not-allowed" : "bg-zinc-800 text-white hover:bg-zinc-700"}">
+                  <iconify-icon icon="lucide:minus" width="12"></iconify-icon>
+                </button>
+
+                <span id="qty-${index}" class="text-sm font-mono w-5 text-center
+                  ${isSoldOut ? "text-zinc-600" : "text-white"}">0</span>
+
+                <button
+                  ${isSoldOut ? "disabled" : ""}
+                  onclick="changeQty(${index}, 1)"
+                  class="w-7 h-7 rounded flex items-center justify-center transition-colors
+                         ${isSoldOut ? "bg-zinc-800 text-zinc-600 cursor-not-allowed" : "bg-white text-black hover:bg-zinc-200"}">
+                  <iconify-icon icon="lucide:plus" width="12"></iconify-icon>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    function changeQty(tierIndex, delta) {
+      const tier      = currentEvent.tickets[tierIndex];
+      const remaining = tier.quantity - (tier.sold || 0);
+      let   newQty    = (ticketQtys[tierIndex] || 0) + delta;
+
+      if (newQty < 0) newQty = 0;
+      if (newQty > remaining) {
+        showToast(`Only ${remaining} tickets left for "${tier.name}"`);
+        return;
+      }
+      if (newQty > 10) {
+        showToast("Maximum 10 tickets per tier");
+        return;
+      }
+
+      ticketQtys[tierIndex] = newQty;
+      document.getElementById(`qty-${tierIndex}`).textContent = newQty;
+      recalcTotal();
+    }
+
+    function recalcTotal() {
+      let total = 0;
+      selectedTiers = [];
+
+      Object.keys(ticketQtys).forEach(key => {
+        const qty  = ticketQtys[key];
+        const tier = currentEvent.tickets[key];
+        if (qty > 0) {
+          total += tier.price * qty;
+          selectedTiers.push({ tier, quantity: qty });
+        }
+      });
+
+      const isFree = total === 0 && selectedTiers.length > 0;
+
+      document.getElementById("bookingTotal").textContent =
+        isFree ? "Free" : total === 0 ? "₦0" : `₦${total.toLocaleString()}`;
+
+      const btn = document.getElementById("bookNowBtn");
+      if (selectedTiers.length > 0) {
+        btn.disabled = false;
+        btn.className = btn.className
+          .replace("bg-zinc-700 text-zinc-400 cursor-not-allowed", "")
+          .trim();
+        btn.classList.add("bg-white", "text-black", "hover:bg-zinc-200", "cursor-pointer");
+        btn.innerHTML = isFree
+          ? `Register Free <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>`
+          : `Confirm Booking <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>`;
+      } else {
+        btn.disabled = true;
+        btn.classList.remove("bg-white", "text-black", "hover:bg-zinc-200", "cursor-pointer");
+        btn.classList.add("bg-zinc-700", "text-zinc-400", "cursor-not-allowed");
+        btn.innerHTML = `Select a ticket to continue <iconify-icon icon="lucide:arrow-right" width="16"></iconify-icon>`;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("bookNowBtn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          if (!currentEvent || selectedTiers.length === 0) return;
+
+          sessionStorage.setItem("checkoutData", JSON.stringify({
+            event: currentEvent,
+            selectedTiers
+          }));
+
+          window.location.href = "checkout.html";
+        });
+      }
+    });
+
+
+    /* ─────────────────────────────────
+       SHARE HELPERS
+    ───────────────────────────────── */
+
+    function getCurrentPageLink() {
+      return window.location.href;
+    }
+
+    function shareViaWhatsApp() {
+      if (!currentEvent) return;
+      const msg = `Check out this event: ${currentEvent.title}!\n\n${getCurrentPageLink()}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+    }
+
+    function shareViaEmail() {
+      if (!currentEvent) return;
+      const subject = `Invitation: ${currentEvent.title}`;
+      const body    = `You're invited to ${currentEvent.title}!\n\nView event details and book your ticket:\n${getCurrentPageLink()}`;
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    function copyPageLink() {
+      navigator.clipboard.writeText(getCurrentPageLink()).then(() => {
+        showToast("Link copied to clipboard!");
+      }).catch(() => {
+        showToast("Could not copy link");
+      });
+    }
+
+
+    /* ─────────────────────────────────
+       TOAST
+    ───────────────────────────────── */
+
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.style.animation = "slideUp 0.3s ease-out";
+      toast.className = "fixed bottom-6 right-6 bg-zinc-800 border border-white/10 text-white px-4 py-3 rounded-lg shadow-xl z-[200] flex items-center gap-2";
+      toast.innerHTML = `
+        <iconify-icon icon="lucide:check-circle" width="16" class="text-emerald-500"></iconify-icon>
+        <span class="text-sm">${message}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(8px)";
+        toast.style.transition = "all 0.3s";
+        setTimeout(() => toast.remove(), 300);
+      }, 2800);
+    }
+
+
+    /* ─────────────────────────────────
+       MAIN: READ URL → LOAD EVENT → RENDER
+    ───────────────────────────────── */
+
+    function showError() {
+      document.getElementById("loadingState").classList.add("hidden");
+      document.getElementById("errorState").classList.remove("hidden");
+    }
+
+    function renderPage(rawEvent) {
+      const event = normalizeEvent(rawEvent);
+      currentEvent = event;
+
+      /* ── Update <title> ── */
+      document.title = `${event.title} – Entriqs`;
+
+      /* ── Hero background ── */
+      const heroBg = document.getElementById("heroBg");
+      if (event.image) {
+        heroBg.style.backgroundImage = `url('${event.image}')`;
+      } else {
+        // Fallback: solid dark gradient
+        heroBg.style.background = "linear-gradient(135deg, #18181b 0%, #09090b 100%)";
+      }
+
+      /* ── Hero badges ── */
+      const badgesEl = document.getElementById("heroBadges");
+      badgesEl.innerHTML = `
+        <span class="px-3 py-1 text-[11px] font-bold tracking-wider rounded-full
+                     bg-black/50 backdrop-blur border border-white/10 text-indigo-300">
+          ${event.category.toUpperCase()}
+        </span>
+        <span class="px-3 py-1 text-[11px] font-bold tracking-wider rounded-full
+                     bg-black/50 backdrop-blur border border-white/10 text-zinc-300">
+          ${event.visibility === "Private" ? "🔒 Private" : "Public"}
+        </span>
+        <span class="px-3 py-1 text-[11px] font-bold tracking-wider rounded-full
+                     bg-black/50 backdrop-blur border border-white/10 text-zinc-300">
+          ${event.format}
+        </span>
+      `;
+
+      /* ── Title & organizer ── */
+      document.getElementById("eventTitle").textContent    = event.title;
+      document.getElementById("eventOrganizer").innerHTML  =
+        `By <span class="text-white font-medium">${event.organizer}</span>`;
+
+      /* ── Date / Time / Location ── */
+      const start = new Date(event.startDate);
+      document.getElementById("eventDate").textContent =
+        start.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      document.getElementById("eventTime").textContent =
+        start.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+
+      const locationEl   = document.getElementById("eventLocation");
+      const locationIcon = document.getElementById("locationIcon");
+      if (event.format === "Online") {
+        locationEl.textContent     = "Online Event";
+        locationIcon.setAttribute("icon", "lucide:monitor");
+        locationIcon.className     = "text-sky-400";
+      } else {
+        locationEl.textContent = event.location;
+      }
+
+      /* ── Description ── */
+      const descEl = document.getElementById("eventDescription");
+      descEl.textContent = event.description || "No description provided for this event.";
+
+      /* ── Private notice ── */
+      if (event.visibility === "Private") {
+        document.getElementById("privateNotice").classList.remove("hidden");
+      }
+
+      /* ── Sidebar starting price label ── */
+      document.getElementById("sidebarPrice").textContent =
+      event.price === "Free" ? "Free Entry" : `From ${event.price}`;
+
+      /* ── Countdown ── */
+      startCountdown(event.startDate);
+
+      /* ── Ticket tiers ── */
+      renderTicketTiers(event);
+
+      /* ── Show page ── */
+      document.getElementById("loadingState").classList.add("hidden");
+      document.getElementById("pageContent").classList.remove("hidden");
+
+      incrementEventViews(rawEvent.id);
+    }
+
+
+    const API_URL = "https://entriqs-backend.onrender.com";
+
+    /* Entry point */
+    document.addEventListener("DOMContentLoaded", async () => {
+      const params  = new URLSearchParams(window.location.search);
+      const eventId = params.get("id");
+
+      if (!eventId) {
+        showError();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/events/${eventId}`);
+        if (!res.ok) { showError(); return; }
+        const data = await res.json();
+        renderPage(data.event);
+      } catch (err) {
+        console.error("Failed to load event", err);
+        showError();
+      }
+    });
+
+    function incrementEventViews(eventId) {
+      // Views are incremented automatically by the backend API
+    }
+  </script>
+
+</body>
+</html>

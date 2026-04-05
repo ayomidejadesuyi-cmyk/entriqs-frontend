@@ -1,0 +1,957 @@
+<html lang="en" class="dark"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENTRIQS - Home</title>
+
+    <script>
+     window.PAGE_MODE = "public";
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { background: '#09090b', surface: '#18181b', primary: '#fafafa', secondary: '#a1a1aa' },
+                    animation: { 'float': 'float 6s ease-in-out infinite', 'float-delayed': 'float 6s ease-in-out 3s infinite' },
+                    keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #fafafa; -webkit-font-smoothing: antialiased; }
+        .glass { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: linear-gradient(180deg, rgba(39, 39, 42, 0.4) 0%, rgba(9, 9, 11, 0.4) 100%); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+
+        .login-modal, .signup-modal { position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 999; }
+        .login-box h2, .signup-box h2 { margin-bottom: 20px; }
+        .login-box input, .signup-box input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #ddd; color: #000; }
+        .login-submit, .signup-submit { width: 100%; padding: 12px; background: #000; color: #fff; border: none; cursor: pointer; font-weight: bold; }
+        .login-submit:hover, .signup-submit:hover { background: #333; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer; }
+        .alt-text { font-size: 13px; margin-top: 15px; }
+        .alt-text a { color: #000; font-weight: bold; text-decoration: none; }
+        .social-login button { width: 100%; margin-top: 10px; padding: 10px; background: #f5f5f5; border: 1px solid #ddd; cursor: pointer; }
+        .organizer-check { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; color: #000; }
+        .organizer-check input[type="checkbox"] { margin: 0; width: 16px; height: 16px; }
+    </style>
+<link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style><link id="all-fonts-link-font-newsreader" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&amp;display=swap"><style id="all-fonts-style-font-newsreader">.font-newsreader { font-family: 'Newsreader', serif !important; }</style><link id="all-fonts-link-font-google-sans-flex" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-google-sans-flex">.font-google-sans-flex { font-family: 'Google Sans Flex', sans-serif !important; }</style><link id="all-fonts-link-font-oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-oswald">.font-oswald { font-family: 'Oswald', sans-serif !important; }</style><link id="all-fonts-link-font-dm-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-dm-sans">.font-dm-sans { font-family: 'DM Sans', sans-serif !important; }</style></head>
+<body class="min-h-screen flex flex-col font-sans text-sm selection:bg-white selection:text-black overflow-x-hidden">
+
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 cursor-pointer group">
+                <div class="w-8 h-8 bg-white text-black flex items-center justify-center rounded-lg font-semibold tracking-tighter text-lg group-hover:bg-zinc-200 transition-colors">EN</div>
+                <span class="font-semibold tracking-tight text-lg hidden sm:block">ENTRIQS</span>
+            </a>
+            <div class="flex items-center gap-6 text-secondary">
+                <a href="events.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">Explore</a>
+                <a href="#" id="loginBtn" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">Login</a>
+                <a href="aboutentriqs.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">About Us</a>
+                <a href="attendee.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">My Tickets</a>
+            </div>
+            <div class="flex items-center gap-4">
+            <div class="relative">
+                <button
+                id="profileBtn"
+                class="hidden w-8 h-8 rounded-full
+                        bg-zinc-900
+                        border border-white/10
+                        flex items-center justify-center
+                        hover:border-white/30
+                        transition
+                        text-xs font-semibold text-white">
+                </button>
+
+                <!-- Profile Dropdown -->
+                <div
+                id="profileDropdown"
+                class="hidden absolute right-0 mt-2 w-56 rounded-lg bg-zinc-900 border border-white/10 shadow-lg text-sm overflow-hidden">
+
+                <!-- User Info -->
+                <div class="px-4 py-3 border-b border-white/10">
+                    <p id="profileName" class="font-medium text-white text-sm truncate">—</p>
+                    <p id="profileEmail" class="text-xs text-zinc-400 truncate">—</p>
+                </div>
+
+                <!-- Links -->
+                <a href="organizer-dashboard.html"
+                    class="block px-4 py-2 hover:bg-white/5">
+                    Dashboard
+                </a>
+
+                <a href="attendee.html"
+                    class="block px-4 py-2 hover:bg-white/5">
+                    My Tickets
+                </a>
+
+                <a href="profile.html"
+                    class="block px-4 py-2 hover:bg-white/5">
+                    My Profile
+                </a>
+                <button id="logoutBtn"
+                    class="w-full text-left px-4 py-2 hover:bg-white/5 text-red-400">
+                    Logout
+                </button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-16 relative flex items-center justify-center overflow-hidden min-h-screen">
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-zinc-800/20 via-background to-background"></div>
+            <div class="absolute right-0 top-1/4 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[100px] opacity-50"></div>
+            <div class="absolute left-0 bottom-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px]"></div>
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-xs text-zinc-300 font-medium tracking-wide">Live Events Worldwide</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter text-white leading-[1.1]">
+                    Experience 
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-500">The Unforgettable.</span>
+                </h1>
+                <p class="text-zinc-400 text-lg max-w-md leading-relaxed">
+                    Access exclusive private gatherings and massive public festivals. Your gateway to the world's most immersive experiences.
+                </p>
+                <div class="flex gap-4 pt-4">
+                    <a href="events.html" class="h-12 px-8 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
+                        Browse Events
+                        <iconify-icon icon="lucide:arrow-right" width="18"></iconify-icon>
+                    </a>
+                    <a href="#" id="openLogin" class="h-12 px-8 rounded-lg border border-white/20 hover:bg-white/5 transition-colors font-medium text-white flex items-center justify-center gap-2">
+                        Create Event
+                    </a>
+                </div>
+            </div>
+
+            <div class="relative h-[600px] hidden lg:block perspective-[1000px]">
+                <a href="events.html"
+                    data-home-event="1"
+                    class="absolute top-10 left-10 w-64 glass-card p-4 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300 animate-float z-20">
+                    <div class="h-32 w-full bg-zinc-800 rounded-lg mb-3 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&amp;fit=crop&amp;q=80&amp;w=400" class="w-full h-full object-cover opacity-80" alt="Event">
+                        <div class="absolute top-2 right-2 px-2 py-0.5 bg-black/50 backdrop-blur rounded text-xs font-mono border border-white/10">SOLD OUT</div>
+                    </div>
+                    <h3 class="text-base font-medium tracking-tight">Neon Nights Festival</h3>
+                    <p class="text-xs text-zinc-400 mt-1 flex items-center gap-1"><iconify-icon icon="lucide:map-pin" width="12"></iconify-icon> Tokyo, Japan</p>
+                </a>
+                <a href="events.html"
+                    data-home-event="2"
+                    class="absolute top-40 right-10 w-60 glass-card p-4 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300 animate-float-delayed z-10">
+                    <div class="h-28 w-full bg-zinc-800 rounded-lg mb-3 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&amp;fit=crop&amp;q=80&amp;w=400" class="w-full h-full object-cover opacity-80" alt="Event">
+                    </div>
+                    <h3 class="text-base font-medium tracking-tight">Tech Summit 2024</h3>
+                    <p class="text-xs text-zinc-400 mt-1 flex items-center gap-1"><iconify-icon icon="lucide:calendar" width="12"></iconify-icon> Oct 12</p>
+                </a>
+                <a href="events.html"
+                    data-home-event="3"
+                    class="absolute bottom-20 left-20 w-56 glass-card p-4 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300 animate-float z-30">
+                    <div class="h-24 w-full bg-zinc-800 rounded-lg mb-3 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1514525253440-b39345208668?auto=format&amp;fit=crop&amp;q=80&amp;w=400" class="w-full h-full object-cover opacity-80" alt="Event">
+                    </div>
+                    <h3 class="text-base font-medium tracking-tight">Underground Jazz</h3>
+                    <p class="text-xs text-zinc-400 mt-1">Private Event</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- LOGIN MODAL -->
+<div class="login-modal" id="loginModal">
+    <div class="login-box">
+        <div class="bg-white w-full max-w-[420px] rounded-2xl p-8 shadow-2xl relative">
+
+        <span class="close-btn absolute top-4 right-4 text-2xl" id="closeLogin">&times;</span>
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="mx-auto w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mb-4">
+            <iconify-icon icon="solar:key-linear" class="text-black text-xl"></iconify-icon>
+            </div>
+            <h2 class="text-xl font-semibold tracking-tight text-black">
+            Welcome back
+            </h2>
+            <p class="text-xs text-zinc-500 mt-2">
+            Login into your ENTRIQS dashboard
+            </p>
+        </div>
+
+        <!-- Form -->
+        <div class="space-y-4">
+            <div class="space-y-1.5">
+            <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+                Email
+            </label>
+            <input
+                type="text"
+                id="loginNameEmail"
+                placeholder="john@example.com"
+                class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+            >
+            </div>
+
+            <div class="space-y-1.5">
+            <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+                Password
+            </label>
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="••••••••"
+                class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+            >
+            </div>
+
+            <button
+            id="loginSubmit"
+            class="w-full py-3 bg-black text-white rounded-lg font-semibold hover:bg-zinc-800 transition text-xs mt-2">
+            Login
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-xs text-zinc-500">
+            Don’t have an account?
+            <a href="#" id="openSignup" class="text-black font-medium hover:underline ml-1">
+            Create one
+            </a>
+        </div>
+
+        <div class="mt-6 space-y-2">
+            <button class="w-full py-2.5 border rounded-lg text-xs text-black hover:bg-zinc-50">
+            Continue with Google
+            </button>
+            <button class="w-full py-2.5 border rounded-lg text-xs text-black hover:bg-zinc-50">
+            Continue with iCloud
+            </button>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- SIGNUP MODAL -->
+<div class="signup-modal" id="signupModal">
+  <div class="bg-white w-full max-w-[440px] rounded-2xl p-8 shadow-2xl relative flex flex-col min-h-[520px]">
+
+    <span class="close-btn absolute top-4 right-4 text-2xl" id="closeSignup">&times;</span>
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold tracking-tight text-black">
+        Create an Account
+        </h2>
+        <div class="flex gap-2">
+        <div id="stepDot1" class="w-2 h-2 rounded-full bg-black"></div>
+        <div id="stepDot2" class="w-2 h-2 rounded-full bg-zinc-300"></div>
+        <div id="stepDot3" class="w-2 h-2 rounded-full bg-zinc-300"></div>
+        </div>
+    </div>
+
+    <!-- STEP 1: BASIC DETAILS -->
+    <div id="signupStep1" class="flex flex-col flex-grow">
+
+  <!-- Intro -->
+  <div class="text-center mb-8">
+    <div class="mx-auto w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mb-4">
+      <iconify-icon icon="solar:user-plus-linear" class="text-black text-xl"></iconify-icon>
+    </div>
+    <p class="text-xs text-zinc-500">
+      Let’s get you started — this takes less than a minute
+    </p>
+  </div>
+
+  <!-- Fields -->
+  <div class="space-y-4">
+    <div class="space-y-1.5">
+      <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+        Full Name
+      </label>
+      <input
+        type="text"
+        id="signupFullName"
+        placeholder="John Doe"
+        class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-black placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-black"
+      >
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+        Email Address
+      </label>
+      <input
+        type="email"
+        id="signupEmail"
+        placeholder="john@example.com"
+        class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-black placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-black"
+      >
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+        Password
+      </label>
+      <input
+        type="password"
+        id="signupPassword"
+        placeholder="Create a secure password"
+        class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-black placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-black"
+      >
+      <p id="passwordHint" class="text-[11px] ml-1 mt-1"></p>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="mt-auto pt-6 space-y-3">
+    <button
+      id="signupNext1"
+      class="w-full py-3 bg-black text-white rounded-lg font-semibold hover:bg-zinc-800 transition text-xs flex items-center justify-center gap-2 group">
+      Continue
+      <iconify-icon icon="solar:arrow-right-linear" class="group-hover:translate-x-1 transition-transform"></iconify-icon>
+    </button>
+
+    <button class="w-full py-2.5 border rounded-lg text-xs text-black hover:bg-zinc-50">
+        Continue with Google
+    </button>
+
+    <button class="w-full py-2.5 border rounded-lg text-xs text-black hover:bg-zinc-50">
+        Continue with iCloud
+    </button>
+
+    <div class="mt-4 text-center text-xs text-zinc-500">
+      Already have an account?
+      <a href="#" id="backToLoginFromSignup" class="text-black font-medium hover:underline ml-1">
+        Log in
+      </a>
+    </div>
+  </div>
+
+</div>
+
+
+    <!-- STEP 2: ROLE SELECTION -->
+    <div id="signupStep2" class="signup-step hidden">
+
+    <p class="text-sm font-medium text-black mb-4">
+        Choose your role
+    </p>
+
+    <div class="space-y-3">
+
+        <!-- Attendee -->
+        <button
+        data-role="attendee"
+        class="role-btn w-full text-left p-4 rounded-xl border border-zinc-200
+                hover:border-black transition flex items-center gap-3">
+
+        <div class="w-10 h-10 rounded-lg bg-black/5 flex items-center justify-center">
+            <iconify-icon icon="lucide:ticket" class="text-black text-lg"></iconify-icon>
+        </div>
+
+        <div>
+            <p class="font-medium text-sm text-black">
+            Attend events
+            </p>
+            <p class="text-xs text-zinc-500">
+            Discover and join upcoming experiences
+            </p>
+        </div>
+
+        </button>
+
+        <!-- Organizer -->
+        <button
+        data-role="organizer"
+        class="role-btn w-full text-left p-4 rounded-xl border border-zinc-200
+                hover:border-black transition flex items-center gap-3">
+
+        <div class="w-10 h-10 rounded-lg bg-black/5 flex items-center justify-center">
+            <iconify-icon icon="lucide:building-2" class="text-black text-lg"></iconify-icon>
+        </div>
+
+        <div>
+            <p class="font-medium text-sm text-black">
+            Organize events
+            </p>
+            <p class="text-xs text-zinc-500">
+            Create, manage, and sell tickets
+            </p>
+        </div>
+
+        </button>
+    </div>
+    </div>
+
+    <!-- STEP 3: ROLE-SPECIFIC -->
+    <div id="signupStep3" class="signup-step hidden flex flex-col flex-grow">
+
+    <!-- Organizer-only -->
+    <div id="organizerFields" class="hidden space-y-4 mb-4">
+
+        <div class="space-y-1.5">
+        <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+            Organization Name
+        </label>
+        <input
+            type="text"
+            id="signupBusiness"
+            placeholder="Your company or brand"
+            class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-black placeholder-zinc-400
+                focus:outline-none focus:ring-1 focus:ring-black"
+        >
+        </div>
+
+        <div class="space-y-1.5">
+        <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+            Location
+        </label>
+        <input
+            type="text"
+            id="signupLocation"
+            placeholder="City, Country"
+            class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-black placeholder-zinc-400
+                focus:outline-none focus:ring-1 focus:ring-black"
+        >
+        </div>
+
+    </div>
+
+    <!-- Security -->
+    <div class="space-y-4">
+
+        <div class="space-y-1.5">
+        <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+            Security Question
+        </label>
+        <input
+            type="text"
+            id="securityQuestion"
+            placeholder="e.g. Name of your first event"
+            class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-black placeholder-zinc-400
+                focus:outline-none focus:ring-1 focus:ring-black"
+        >
+        </div>
+
+        <div class="space-y-1.5">
+        <label class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500 ml-1">
+            Security Answer
+        </label>
+        <input
+            type="text"
+            id="securityAnswer"
+            placeholder="Your answer"
+            class="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-black placeholder-zinc-400
+                focus:outline-none focus:ring-1 focus:ring-black"
+        >
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-auto pt-6">
+
+        <button
+        id="signupSubmitFinal"
+        class="w-full py-3 bg-black text-white rounded-lg
+                font-semibold hover:bg-zinc-800 transition text-xs">
+        Create Account
+        </button>
+    </div>
+    </div>
+  </div>
+</div>
+</body>
+<script src="auth.js"></script>
+<script>
+
+const loginModal = document.getElementById('loginModal');
+const signupModal = document.getElementById('signupModal');
+
+const loginBtn = document.getElementById('loginBtn');
+const closeLogin = document.getElementById('closeLogin');
+const closeSignup = document.getElementById('closeSignup');
+const openSignup = document.getElementById('openSignup');
+const openLogin = document.getElementById('openLogin');
+const profileBtn = document.getElementById("profileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+const signupSubmit = document.querySelector(".signup-submit");
+
+/* =========================
+   SIGNUP DRAFT STATE
+   (frontend-only, backend-ready)
+========================= */
+
+let signupDraft = {
+  fullName: "",
+  email: "",
+  password: "",
+  role: null,          // "attendee" | "organizer"
+  organization: "",
+  location: "",
+  securityQuestion: "",
+  securityAnswer: ""
+};
+
+let signupStep = 1;
+
+// Navigation logic
+const step1 = document.getElementById("signupStep1");
+const step2 = document.getElementById("signupStep2");
+const step3 = document.getElementById("signupStep3");
+
+function updateSignupDots(step) {
+  const dot1 = document.getElementById("stepDot1");
+  const dot2 = document.getElementById("stepDot2");
+  const dot3 = document.getElementById("stepDot3");
+
+  if (!dot1 || !dot2 || !dot3) return;
+
+  // Reset all
+  [dot1, dot2, dot3].forEach(dot => {
+    dot.classList.remove("bg-black");
+    dot.classList.add("bg-zinc-300");
+  });
+
+  // Activate completed steps
+  if (step >= 1) dot1.classList.replace("bg-zinc-300", "bg-black");
+  if (step >= 2) dot2.classList.replace("bg-zinc-300", "bg-black");
+  if (step >= 3) dot3.classList.replace("bg-zinc-300", "bg-black");
+}
+
+function resetSignupFlow() {
+  signupDraft = {
+    fullName: "",
+    email: "",
+    password: "",
+    role: null,
+    organization: "",
+    location: "",
+    securityQuestion: "",
+    securityAnswer: ""
+  };
+
+  signupStep = 1;
+
+  // Reset steps
+  step1.classList.remove("hidden");
+  step2.classList.add("hidden");
+  step3.classList.add("hidden");
+
+  // Reset inputs
+  document.querySelectorAll("#signupModal input").forEach(input => {
+    input.value = "";
+  });
+
+  // Hide organizer fields
+  document.getElementById("organizerFields")?.classList.add("hidden");
+
+  // Reset role buttons
+  document.querySelectorAll(".role-btn").forEach(btn => {
+    btn.classList.remove("bg-black", "text-white");
+  });
+
+  updateSignupDots(1);
+}
+
+// Live password feedback
+document.getElementById("signupPassword").addEventListener("input", () => {
+  const val = document.getElementById("signupPassword").value;
+  const hint = document.getElementById("passwordHint");
+  if (!hint) return;
+  if (val.length === 0) {
+    hint.textContent = "";
+  } else if (val.length < 8) {
+    hint.textContent = `${8 - val.length} more character${8 - val.length > 1 ? "s" : ""} needed`;
+    hint.className = "text-[11px] ml-1 text-red-400 mt-1";
+  } else {
+    hint.textContent = "✓ Password looks good";
+    hint.className = "text-[11px] ml-1 text-emerald-400 mt-1";
+  }
+});
+
+document.getElementById("signupNext1").addEventListener("click", () => {
+  signupDraft.fullName =
+    document.getElementById("signupFullName").value.trim();
+  signupDraft.email =
+    document.getElementById("signupEmail").value.trim();
+  signupDraft.password =
+    document.getElementById("signupPassword").value;
+
+  if (!signupDraft.fullName || !signupDraft.email || !signupDraft.password) {
+    alert("Please fill in all required fields");
+    return;
+  }
+
+  if (signupDraft.password.length < 8) {
+    alert("Password must be at least 8 characters");
+    document.getElementById("signupPassword").focus();
+    return;
+  }
+
+  step1.classList.add("hidden");
+  step2.classList.remove("hidden");
+  signupStep = 2;
+
+  updateSignupDots(2);
+});
+
+// Role selection logic
+document.querySelectorAll(".role-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    signupDraft.role = btn.dataset.role;
+
+    document.querySelectorAll(".role-btn").forEach(b =>
+      b.classList.remove("bg-black", "text-white")
+    );
+    btn.classList.add("border-black", "ring-1", "ring-black");
+
+    const organizerFields =
+      document.getElementById("organizerFields");
+
+    if (signupDraft.role === "organizer") {
+      organizerFields.classList.remove("hidden");
+    } else {
+      organizerFields.classList.add("hidden");
+    }
+
+    step2.classList.add("hidden");
+    step3.classList.remove("hidden");
+    signupStep = 3;
+
+    updateSignupDots(3);
+  });
+});
+
+// profile dropdown
+profileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileDropdown.classList.toggle("hidden");
+});
+// <!--profile login submit js -->
+const loginSubmit = document.getElementById("loginSubmit");
+
+loginSubmit.addEventListener("click", async () => {
+    const email    = document.getElementById("loginNameEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
+    if (!email || !password) {
+      alert("Please enter your email and password");
+      return;
+    }
+
+    loginSubmit.textContent = "Logging in...";
+    loginSubmit.disabled = true;
+
+    try {
+      const res  = await fetch("https://entriqs-backend.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Login failed. Please try again.");
+        return;
+      }
+
+      // Store token
+      localStorage.setItem("entriqs_token", data.token);
+
+      // Build user object compatible with existing frontend
+      const u = data.user;
+      const newUser = {
+        id:               u.id,
+        firstName:        u.first_name || "",
+        lastName:         u.last_name  || "",
+        email:            u.email,
+        role:             u.role,
+        uniqueId:         u.unique_id  || generateUniqueId(u.role),
+        initials:         `${u.first_name?.[0] || ""}${u.last_name?.[0] || ""}`.toUpperCase(),
+        organizationName: u.organization_name || null,
+        avatar:           u.avatar || null
+      };
+
+      userSession = { isAuthenticated: true, user: newUser };
+      saveSession();
+      loginModal.style.display = "none";
+      updateAuthUI();
+
+    } catch (err) {
+      console.error("Login error", err);
+      alert("Could not connect to server. Please try again.");
+    } finally {
+      loginSubmit.textContent = "Login";
+      loginSubmit.disabled = false;
+    }
+});
+
+// <!--profile logout js -->
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", logout);
+}
+
+
+// Close dropdown when clicking outside
+document.addEventListener("click", () => {
+    profileDropdown.classList.add("hidden");
+});
+
+// Open login modal
+loginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginModal.style.display = 'flex';
+});
+
+// Close login
+closeLogin.addEventListener('click', () => {
+    loginModal.style.display = 'none';
+});
+
+// Open signup from login
+openSignup.addEventListener('click', (e) => {
+  e.preventDefault();
+  loginModal.style.display = 'none';
+  signupModal.style.display = 'flex';
+
+  resetSignupFlow();
+});
+
+// Close signup
+closeSignup.addEventListener('click', () => {
+  signupModal.style.display = 'none';
+  resetSignupFlow();
+});
+
+// Close when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target === loginModal) loginModal.style.display = 'none';
+    if (e.target === signupModal) signupModal.style.display = 'none';
+});
+
+document.getElementById("signupSubmitFinal").addEventListener("click", async () => {
+  signupDraft.organization =
+    document.getElementById("signupBusiness")?.value.trim();
+  signupDraft.location =
+    document.getElementById("signupLocation")?.value.trim();
+  signupDraft.securityQuestion =
+    document.getElementById("securityQuestion").value.trim();
+  signupDraft.securityAnswer =
+    document.getElementById("securityAnswer").value.trim();
+
+  if (signupDraft.role === "organizer" && !signupDraft.organization) {
+    alert("Organization name is required");
+    return;
+  }
+
+  const submitBtn = document.getElementById("signupSubmitFinal");
+  submitBtn.textContent = "Creating account...";
+  submitBtn.disabled = true;
+
+  const nameParts = signupDraft.fullName.split(" ");
+
+  try {
+    const res = await fetch("https://entriqs-backend.onrender.com/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email:            signupDraft.email,
+        password:         signupDraft.password,
+        role:             signupDraft.role,
+        firstName:        nameParts[0],
+        lastName:         nameParts.slice(1).join(" "),
+        organizationName: signupDraft.organization || null,
+        location:         signupDraft.location || null,
+        securityQuestion: signupDraft.securityQuestion,
+        securityAnswer:   signupDraft.securityAnswer
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Signup failed. Please try again.");
+      return;
+    }
+
+    // Store token
+    localStorage.setItem("entriqs_token", data.token);
+
+    // Build user object
+    const u = data.user;
+    const newUser = {
+      id:               u.id,
+      firstName:        u.first_name || nameParts[0],
+      lastName:         u.last_name  || nameParts.slice(1).join(" "),
+      email:            u.email,
+      role:             u.role,
+      uniqueId:         generateUniqueId(u.role),
+      initials:         `${nameParts[0]?.[0] || ""}${nameParts[1]?.[0] || ""}`.toUpperCase(),
+      organizationName: u.organization_name || null,
+      avatar:           null
+    };
+
+    userSession = { isAuthenticated: true, user: newUser };
+    registerUserInRegistry(newUser);
+    saveSession();
+    signupModal.style.display = "none";
+    resetSignupFlow();
+    updateAuthUI();
+
+  } catch (err) {
+    console.error("Signup error", err);
+    alert("Could not connect to server. Please try again.");
+  } finally {
+    submitBtn.textContent = "Create Account";
+    submitBtn.disabled = false;
+  }
+});
+
+// Back to login button handler
+const backToLoginFromSignup =
+  document.getElementById("backToLoginFromSignup");
+
+if (backToLoginFromSignup) {
+  backToLoginFromSignup.addEventListener("click", (e) => {
+    e.preventDefault();
+    signupModal.style.display = "none";
+    loginModal.style.display = "flex";
+  });
+}
+
+</script>
+<script>
+/* =========================
+   HOMEPAGE EVENTS ENGINE
+   (PUBLIC EVENTS ONLY)
+========================= */
+
+function getAllEvents() {
+  try {
+    const raw = localStorage.getItem("entriqs_events");
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+    if (typeof parsed === "object") return Object.values(parsed);
+
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeEvent(event) {
+  return {
+    title: event.name || event.title || "Untitled Event",
+    image: event.imageUrl || event.image || "",
+    startDate: event.date || event.startDate,
+    location: event.location || "TBA",
+    visibility: event.eventType === "private" ? "Private" : "Public"
+  };
+}
+
+
+
+
+ // PUBLIC EVENTS ONLY + SHUFFLE
+function shuffleArray(arr) {
+  return arr.sort(() => Math.random() - 0.5);
+}
+
+function getPublicUpcomingEvents() {
+  const now = Date.now();
+
+  return getAllEvents()
+    .map(normalizeEvent)
+    .filter(e =>
+      e.visibility === "Public" &&
+      e.startDate &&
+      new Date(e.startDate).getTime() > now
+    );
+}
+
+
+
+function renderHomepageEvents() {
+  const slots = document.querySelectorAll("[data-home-event]");
+  if (!slots.length) return;
+
+  let events = getPublicUpcomingEvents();
+
+  if (events.length === 0) return; // fallback = keep hardcoded
+
+  events = shuffleArray(events).slice(0, slots.length);
+
+  slots.forEach((slot, index) => {
+    const event = events[index];
+    if (!event) return;
+
+    const img = slot.querySelector("img");
+    const title = slot.querySelector("h3");
+    const meta = slot.querySelector("p");
+
+    if (img && event.image) img.src = event.image;
+    if (title) title.textContent = event.title;
+
+    if (meta) {
+      meta.innerHTML = `
+        <iconify-icon icon="lucide:calendar" width="12"></iconify-icon>
+        ${new Date(event.startDate).toLocaleDateString()}
+      `;
+    }
+  });
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderHomepageEvents();
+
+  // Rotate every 20 minutes
+  setInterval(renderHomepageEvents, 20 * 60 * 1000);
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const createEventBtn = document.getElementById("openLogin");
+  if (!createEventBtn) return;
+
+  createEventBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    // 1️⃣ Not logged in → open login modal
+    if (!userSession.isAuthenticated || !userSession.user) {
+      const loginModal = document.getElementById("loginModal");
+      if (loginModal) {
+        loginModal.style.display = "flex";
+      }
+      return;
+    }
+
+    // 2️⃣ Organizer → go to dashboard with create modal open
+    if (userSession.user.role === "organizer") {
+      window.location.href = "organizer-dashboard.html#create-event";
+      return;
+    }
+
+    // 3️⃣ Attendee → should never happen (button hidden)
+  });
+});
+
+</script>
+</html>

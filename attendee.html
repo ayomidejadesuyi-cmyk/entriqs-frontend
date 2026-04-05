@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Tickets – Entriqs</title>
+
+<script>
+  window.PAGE_MODE = "protected";
+  window.REQUIRED_ROLE = "attendee";
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<style>
+  * { font-family: 'DM Sans', sans-serif; }
+  .mono { font-family: 'DM Mono', monospace; }
+
+  body { background: #080808; }
+
+  .glass {
+    background: rgba(8, 8, 8, 0.75);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .glass-panel {
+    background: rgba(24,24,27,0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .tab-active {
+    color: white;
+    border-bottom: 2px solid white;
+  }
+
+  /* ── Ticket card ── */
+  .ticket-card {
+    transition: transform 0.2s cubic-bezier(.22,.68,0,1.2), box-shadow 0.2s;
+  }
+  .ticket-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  .ticket-card.locked {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  .ticket-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ── Transfer step indicator ── */
+  .step-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.2s;
+  }
+  .step-dot.active { background: white; }
+
+  /* ── Input styles ── */
+  .field-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: white;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .field-input:focus { border-color: rgba(255,255,255,0.3); }
+  .field-input::placeholder { color: rgba(255,255,255,0.25); }
+  .field-input.mono-input { font-family: 'DM Mono', monospace; letter-spacing: 0.08em; }
+  .field-input.error { border-color: rgba(239,68,68,0.6); }
+  .field-input.success { border-color: rgba(16,185,129,0.6); }
+
+  /* ── Validation feedback ── */
+  .validation-msg {
+    font-size: 11px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .validation-msg.error   { color: #f87171; }
+  .validation-msg.success { color: #6ee7b7; }
+
+  /* ── Pal items ── */
+  .pal-item { transition: all 0.15s; }
+  .pal-item:hover { background: rgba(255,255,255,0.05); }
+  .pal-selected {
+    background: rgba(99,102,241,0.15) !important;
+    border-color: rgba(99,102,241,0.5) !important;
+  }
+
+  /* ── Pending transfer badge ── */
+  .pending-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 999px;
+    font-size: 10px; font-weight: 600;
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.35);
+    color: #fcd34d;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.3s ease-out both; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-6px); }
+    40%,80% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease-out; }
+
+  /* ── Spinner ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: black;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+</style>
+
+<body class="text-white min-h-screen">
+
+<!-- ═══════════════════════════════════════
+     NAV
+════════════════════════════════════════ -->
+<nav class="fixed top-0 w-full z-50 glass">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+    <a href="index.html" class="flex gap-2 items-center">
+      <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-sm">EN</div>
+      <span class="hidden sm:block font-semibold tracking-tight">ENTRIQS</span>
+    </a>
+    <div class="flex items-center gap-5 text-xs uppercase tracking-wider text-zinc-400">
+      <a href="index.html"   class="hover:text-white transition-colors">Home</a>
+      <a href="events.html"  class="hover:text-white transition-colors">Explore</a>
+      <a href="attendee.html" class="text-white">My Tickets</a>
+
+      <!-- 🔔 Notification bell slot (populated by auth.js) -->
+      <span id="notificationBellSlot"></span>
+
+      <!-- Profile Dropdown -->
+      <div class="relative">
+        <button id="profileBtn"
+          class="hidden w-8 h-8 rounded-full bg-zinc-900 border border-white/10
+                 flex items-center justify-center hover:border-white/30 transition text-xs font-semibold text-white">
+        </button>
+        <div id="profileDropdown"
+          class="hidden absolute right-0 mt-2 w-64 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-lg z-50">
+          <div class="px-4 py-3 border-b border-white/10">
+            <p class="text-sm font-medium" id="profileName">User Name</p>
+            <p class="text-xs text-zinc-500" id="profileEmail">user@email.com</p>
+            <!-- 🆔 Unique ID badge -->
+            <div class="mt-2" id="uniqueIdBadgeSlot">
+              <div class="flex items-center gap-1.5 px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg w-fit">
+                <iconify-icon icon="lucide:fingerprint" width="11" class="text-indigo-400"></iconify-icon>
+                <span id="uniqueIdDisplay" class="text-[10px] font-mono font-semibold text-indigo-300">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="py-1">
+            <a href="profile.html" class="block px-4 py-2 text-sm hover:bg-white/5">My Profile</a>
+            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     MAIN
+════════════════════════════════════════ -->
+<main class="pt-24 pb-16 max-w-7xl mx-auto px-6">
+
+  <!-- Page Header -->
+  <div class="mb-10">
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <p class="text-xs uppercase tracking-widest text-indigo-400 font-semibold mb-1">Your Account</p>
+        <h1 class="text-3xl font-bold tracking-tight mb-1">My Tickets</h1>
+        <p class="text-zinc-500 text-sm">Manage your event tickets and bookings</p>
+      </div>
+      <button onclick="openPalsManager()"
+        class="px-4 py-2 bg-zinc-800 border border-white/10 text-white text-sm font-medium rounded-xl
+               hover:bg-zinc-700 transition-colors flex items-center gap-2">
+        <iconify-icon icon="lucide:users" width="15"></iconify-icon>
+        Pals List
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="glass-panel rounded-xl p-4">
+        <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Total Tickets</p>
+        <p class="text-2xl font-bold" id="totalTicketsCount">0</p>
+      </div>
+      <div class="glass-panel rounded-xl p-4">
+        <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Upcoming Events</p>
+        <p class="text-2xl font-bold" id="upcomingEventsCount">0</p>
+      </div>
+      <div class="glass-panel rounded-xl p-4">
+        <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Total Spent</p>
+        <p class="text-2xl font-bold mono" id="totalSpent">₦0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="border-b border-white/10 mb-8">
+    <div class="flex gap-8">
+      <button onclick="switchTab('active')" id="activeTab"
+        class="tab-active pb-3 text-sm font-medium transition-colors">
+        Active Tickets
+      </button>
+      <button onclick="switchTab('past')" id="pastTab"
+        class="pb-3 text-sm font-medium text-zinc-500 hover:text-white transition-colors">
+        Past Events
+      </button>
+    </div>
+  </div>
+
+  <!-- Active Tickets -->
+  <div id="activeTicketsSection">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-base font-semibold">Upcoming Events</h2>
+      <a href="events.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+        <iconify-icon icon="lucide:plus" width="13"></iconify-icon> Browse Events
+      </a>
+    </div>
+    <div id="activeTicketsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
+
+  <!-- Past Tickets -->
+  <div id="pastTicketsSection" class="hidden">
+    <div class="mb-6"><h2 class="text-base font-semibold">Past Events</h2></div>
+    <div id="pastTicketsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
+
+</main>
+
+
+<!-- ═══════════════════════════════════════
+     TRANSFER MODAL  (2-step)
+════════════════════════════════════════ -->
+<div id="transferModal" class="fixed inset-0 z-[110] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTransferModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl fade-up">
+
+      <!-- Header -->
+      <div class="p-6 border-b border-white/10 flex justify-between items-start">
+        <div>
+          <h3 class="text-base font-bold">Transfer Ticket</h3>
+          <p class="text-xs text-zinc-500 mt-0.5" id="transferSubtitle">Enter the receiver's unique ID</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Step dots -->
+          <div class="flex gap-1.5">
+            <div class="step-dot active" id="stepDot1"></div>
+            <div class="step-dot"        id="stepDot2"></div>
+          </div>
+          <button onclick="closeTransferModal()" class="text-zinc-400 hover:text-white ml-1">
+            <iconify-icon icon="lucide:x" width="18"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Step 1: Enter receiver unique ID ── -->
+      <div id="transferStep1" class="p-6">
+
+        <!-- Ticket being transferred (mini summary) -->
+        <div id="transferTicketSummary"
+          class="flex items-center gap-3 p-3 bg-zinc-800/60 border border-white/8 rounded-xl mb-5">
+          <div class="w-9 h-9 rounded-lg bg-indigo-500/20 flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:ticket" width="16" class="text-indigo-400"></iconify-icon>
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-white truncate" id="transferTicketName">—</p>
+            <p class="text-xs text-zinc-500" id="transferTicketTier">—</p>
+          </div>
+        </div>
+
+        <!-- Receiver ID input -->
+        <div class="mb-4">
+          <label class="text-xs text-zinc-400 uppercase tracking-wider font-semibold block mb-2">
+            Receiver's Unique ID
+          </label>
+          <input
+            id="receiverUniqueIdInput"
+            type="text"
+            placeholder="ATT-XXXXXXX"
+            maxlength="11"
+            class="field-input mono-input"
+            oninput="onReceiverIdInput(this)"
+          >
+          <div id="receiverValidationMsg" class="validation-msg" style="display:none;"></div>
+        </div>
+
+        <!-- Receiver preview (shown after valid ID) -->
+        <div id="receiverPreview"
+          class="hidden flex items-center gap-3 p-3 bg-emerald-500/8 border border-emerald-500/25 rounded-xl mb-5">
+          <div class="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-500/30
+                      flex items-center justify-center shrink-0 text-xs font-bold text-emerald-400"
+               id="receiverInitials">?</div>
+          <div>
+            <p class="text-sm font-semibold text-white" id="receiverName">—</p>
+            <p class="text-xs text-zinc-400" id="receiverRoleLabel">—</p>
+          </div>
+          <iconify-icon icon="lucide:check-circle" width="16" class="text-emerald-400 ml-auto shrink-0"></iconify-icon>
+        </div>
+
+        <button onclick="goToTransferStep2()"
+          id="toStep2Btn"
+          disabled
+          class="w-full py-2.5 bg-white text-black text-sm font-bold rounded-xl
+                 hover:bg-zinc-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed
+                 flex items-center justify-center gap-2">
+          Continue
+          <iconify-icon icon="lucide:arrow-right" width="14"></iconify-icon>
+        </button>
+      </div>
+
+      <!-- ── Step 2: Confirm with password ── -->
+      <div id="transferStep2" class="p-6 hidden">
+
+        <!-- Confirmation summary -->
+        <div class="p-4 bg-zinc-800/50 border border-white/8 rounded-xl mb-5 space-y-2">
+          <div class="flex justify-between text-xs">
+            <span class="text-zinc-500">Ticket</span>
+            <span class="text-white font-medium" id="confirmTicketName">—</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="text-zinc-500">Transferring to</span>
+            <span class="text-white font-medium font-mono" id="confirmReceiverName">—</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="text-zinc-500">Receiver ID</span>
+            <span class="text-indigo-400 font-mono font-semibold" id="confirmReceiverId">—</span>
+          </div>
+        </div>
+
+        <!-- Password confirmation -->
+        <div class="mb-5">
+          <label class="text-xs text-zinc-400 uppercase tracking-wider font-semibold block mb-2">
+            Confirm Your Password
+          </label>
+          <div class="relative">
+            <input
+              id="transferPasswordInput"
+              type="password"
+              placeholder="Enter your account password"
+              class="field-input pr-10"
+              onkeydown="if(event.key==='Enter') confirmTransfer()"
+            >
+            <button type="button" onclick="togglePasswordVisibility('transferPasswordInput', this)"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors">
+              <iconify-icon icon="lucide:eye" width="15"></iconify-icon>
+            </button>
+          </div>
+          <div id="passwordValidationMsg" class="validation-msg" style="display:none;"></div>
+        </div>
+
+        <div class="p-3 bg-amber-500/8 border border-amber-500/20 rounded-xl mb-5">
+          <p class="text-xs text-amber-300 flex items-start gap-2">
+            <iconify-icon icon="lucide:alert-triangle" width="13" class="shrink-0 mt-0.5"></iconify-icon>
+            This action is permanent. Once transferred, the ticket will be locked and sent to the receiver for acceptance.
+          </p>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="backToTransferStep1()"
+            class="flex-1 py-2.5 border border-white/10 text-sm font-medium rounded-xl hover:bg-white/5 transition-colors">
+            Back
+          </button>
+          <button onclick="confirmTransfer()" id="confirmTransferBtn"
+            class="flex-1 py-2.5 bg-white text-black text-sm font-bold rounded-xl
+                   hover:bg-zinc-100 transition-colors flex items-center justify-center gap-2">
+            <iconify-icon icon="lucide:send" width="14"></iconify-icon>
+            Send Transfer
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PALS MANAGER MODAL
+════════════════════════════════════════ -->
+<div id="palsManagerModal" class="fixed inset-0 z-[110] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closePalsManager()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md max-h-[90vh] flex flex-col">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-full fade-up">
+
+      <div class="p-6 border-b border-white/10 shrink-0 flex justify-between items-start">
+        <div>
+          <h3 class="text-base font-bold">Pals List</h3>
+          <p class="text-xs text-zinc-500 mt-0.5">Save friends by their unique ID for quick transfers</p>
+        </div>
+        <button onclick="closePalsManager()" class="text-zinc-400 hover:text-white">
+          <iconify-icon icon="lucide:x" width="18"></iconify-icon>
+        </button>
+      </div>
+
+      <!-- Add pal by unique ID -->
+      <div class="p-6 border-b border-white/10 shrink-0">
+        <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold block mb-2">
+          Add by Unique ID
+        </label>
+        <div class="flex gap-2">
+          <input
+            id="addPalUniqueId"
+            type="text"
+            placeholder="ATT-XXXXXXX"
+            maxlength="11"
+            class="field-input mono-input flex-1"
+            oninput="this.value = this.value.toUpperCase()"
+          >
+          <button onclick="addPalByUniqueId()"
+            class="px-4 py-2 bg-white text-black text-sm font-bold rounded-xl hover:bg-zinc-200 transition-colors shrink-0">
+            Add
+          </button>
+        </div>
+        <div id="addPalMsg" class="validation-msg" style="display:none;"></div>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1">
+        <div id="palsManagerList" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     CALENDAR REMINDER MODAL
+════════════════════════════════════════ -->
+<div id="calendarReminderModal" class="fixed inset-0 z-[120] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeCalendarReminderModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl fade-up">
+      <div class="p-6 border-b border-white/10">
+        <h3 class="text-base font-bold">Set Reminders</h3>
+        <p class="text-xs text-zinc-500 mt-0.5">Choose when you'd like to be reminded</p>
+      </div>
+      <div class="p-6 space-y-3">
+        <label class="flex items-center gap-3 p-3 border border-white/10 rounded-xl cursor-pointer hover:bg-white/5">
+          <input type="checkbox" id="reminder7days" class="w-4 h-4" checked>
+          <div><p class="text-sm font-medium">7 days before</p><p class="text-xs text-zinc-500">Plan ahead</p></div>
+        </label>
+        <label class="flex items-center gap-3 p-3 border border-white/10 rounded-xl cursor-pointer hover:bg-white/5">
+          <input type="checkbox" id="reminder1day" class="w-4 h-4" checked>
+          <div><p class="text-sm font-medium">1 day before</p><p class="text-xs text-zinc-500">Last-minute prep</p></div>
+        </label>
+        <label class="flex items-center gap-3 p-3 border border-white/10 rounded-xl cursor-pointer hover:bg-white/5">
+          <input type="checkbox" id="reminder2hours" class="w-4 h-4" checked>
+          <div><p class="text-sm font-medium">2 hours before</p><p class="text-xs text-zinc-500">Don't be late!</p></div>
+        </label>
+      </div>
+      <div class="p-6 border-t border-white/10 flex gap-3">
+        <button onclick="closeCalendarReminderModal()"
+          class="flex-1 py-2.5 border border-white/10 text-sm font-medium rounded-xl hover:bg-white/5">Cancel</button>
+        <button onclick="confirmAddToCalendar()"
+          class="flex-1 py-2.5 bg-white text-black text-sm font-bold rounded-xl hover:bg-zinc-200">Add to Calendar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     TICKET DETAIL MODAL
+════════════════════════════════════════ -->
+<div id="ticketDetailModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTicketDetail()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl fade-up">
+
+      <div class="p-6 border-b border-white/10 flex justify-between items-start">
+        <div>
+          <h3 class="text-base font-bold" id="modalEventName">Event Name</h3>
+          <p class="text-xs text-zinc-500 mt-0.5 mono" id="modalTicketId">TICK-ABC123</p>
+        </div>
+        <!-- Pending badge (shown when transfer is pending) -->
+        <div id="modalPendingBadge" class="hidden">
+          <span class="pending-badge">
+            <iconify-icon icon="lucide:lock" width="9"></iconify-icon>
+            Transfer Pending
+          </span>
+        </div>
+        <button onclick="closeTicketDetail()" class="text-zinc-400 hover:text-white ml-3">
+          <iconify-icon icon="lucide:x" width="18"></iconify-icon>
+        </button>
+      </div>
+
+      <!-- QR Code -->
+      <div class="p-6 flex justify-center bg-white">
+        <div id="qrCodeContainer" class="w-48 h-48"></div>
+      </div>
+
+      <!-- Details -->
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Date</p>
+            <p class="text-sm font-medium" id="modalEventDate">—</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Location</p>
+            <p class="text-sm font-medium" id="modalEventLocation">—</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Ticket Tier</p>
+            <p class="text-sm font-medium" id="modalTicketTier">—</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Price</p>
+            <p class="text-sm font-medium mono" id="modalTicketPrice">₦0</p>
+          </div>
+        </div>
+
+        <!-- Pending transfer notice -->
+        <div id="modalPendingNotice"
+          class="hidden p-3 bg-amber-500/8 border border-amber-500/20 rounded-xl">
+          <p class="text-xs text-amber-300 flex items-start gap-2">
+            <iconify-icon icon="lucide:clock" width="13" class="shrink-0 mt-0.5"></iconify-icon>
+            <span>This ticket is awaiting acceptance by <strong id="modalPendingTo" class="text-amber-200 mono"></strong>.
+            Transfer actions are disabled until resolved.</span>
+          </p>
+          <button onclick="cancelPendingTransfer()" id="cancelTransferBtn"
+            class="mt-2 text-[11px] text-red-400 hover:text-red-300 underline">
+            Cancel transfer
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-3 pt-2 border-t border-white/10">
+          <button onclick="addToCalendar()"
+            class="w-full py-2.5 bg-white text-black text-sm font-bold rounded-xl
+                   hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
+            <iconify-icon icon="lucide:calendar-plus" width="15"></iconify-icon>
+            Add to Calendar
+          </button>
+
+          <button onclick="openTransferModal()" id="transferBtn"
+            class="w-full py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl
+                   hover:bg-indigo-500 transition-colors flex items-center justify-center gap-2
+                   disabled:opacity-40 disabled:cursor-not-allowed">
+            <iconify-icon icon="lucide:send" width="15"></iconify-icon>
+            Transfer Ticket
+          </button>
+
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="downloadTicket()"
+              class="py-2 border border-white/10 text-xs font-medium rounded-xl hover:bg-white/5
+                     transition-colors flex items-center justify-center gap-1.5">
+              <iconify-icon icon="lucide:download" width="13"></iconify-icon> Download
+            </button>
+            <button onclick="shareTicket()"
+              class="py-2 border border-white/10 text-xs font-medium rounded-xl hover:bg-white/5
+                     transition-colors flex items-center justify-center gap-1.5">
+              <iconify-icon icon="lucide:share-2" width="13"></iconify-icon> Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════ -->
+<script src="auth.js"></script>
+<script>
+
+/* =========================
+   STATE
+========================= */
+let currentTicket       = null;
+let transferReceiverUser = null; // resolved user object from step 1
+
+/* =========================
+   DATA HELPERS
+========================= */
+
+function getCurrentUserId() {
+  return window.userSession?.user?.id || null;
+}
+
+function getCurrentUserObj() {
+  return window.userSession?.user || null;
+}
+
+function getUserBookings() {
+  const userId = getCurrentUserId();
+  if (!userId) return [];
+  try {
+    return JSON.parse(localStorage.getItem(`userBookings_${userId}`) || "[]");
+  } catch { return []; }
+}
+
+function saveUserBookings(bookings) {
+  const userId = getCurrentUserId();
+  if (!userId) return;
+  localStorage.setItem(`userBookings_${userId}`, JSON.stringify(bookings));
+}
+
+function getEventById(eventId) {
+  try {
+    const raw = localStorage.getItem("entriqs_events");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.find(e => e.id === eventId) || null;
+    return parsed[eventId] || null;
+  } catch { return null; }
+}
+
+function getActiveTickets() {
+  return getUserBookings().filter(t => new Date(t.eventDate) >= new Date());
+}
+
+function getPastTickets() {
+  return getUserBookings().filter(t => new Date(t.eventDate) < new Date());
+}
+
+/* =========================
+   RENDER TICKETS
+========================= */
+
+function renderTicketCard(ticket) {
+  const event = getEventById(ticket.eventId);
+  if (event?.tickets) {
+    const tier = event.tickets.find(t => t.name === ticket.ticketTier);
+    if (tier?.ticketTemplate) return renderTemplatedTicket(ticket, tier.ticketTemplate);
+  }
+  return renderDefaultTicket(ticket);
+}
+
+function renderDefaultTicket(ticket) {
+  const eventDate = new Date(ticket.eventDate);
+  const isPast    = eventDate < new Date();
+  const isPending = ticket.transferStatus === "pending";
+
+  return `
+  <div class="ticket-card bg-zinc-900 border ${isPending ? "border-amber-500/30" : "border-white/8"} rounded-2xl overflow-hidden relative
+              ${isPending ? "locked" : "cursor-pointer"}"
+       onclick="${isPending ? "" : `openTicketDetail('${ticket.id}')`}">
+
+    <!-- Perforated edges -->
+    <div class="absolute top-1/2 left-0 w-3 h-6 bg-[#080808] rounded-r-full -mt-3 border-r border-y border-white/10"></div>
+    <div class="absolute top-1/2 right-0 w-3 h-6 bg-[#080808] rounded-l-full -mt-3 border-l border-y border-white/10"></div>
+
+    ${isPending ? `
+    <div class="absolute top-3 left-3 z-10">
+      <span class="pending-badge">
+        <iconify-icon icon="lucide:lock" width="9"></iconify-icon>
+        Transfer Pending
+      </span>
+    </div>` : ""}
+
+    <div class="p-6 pb-8 ${isPending ? "pt-10" : ""}">
+      ${ticket.eventImage ? `
+      <div class="aspect-[16/9] rounded-xl overflow-hidden mb-4 bg-zinc-800">
+        <img src="${ticket.eventImage}" class="w-full h-full object-cover ${isPending ? "opacity-50" : ""}">
+      </div>` : ""}
+
+      <div class="flex justify-between items-start mb-3">
+        <div class="flex-1 min-w-0">
+          <h3 class="font-bold text-base tracking-tight text-white leading-tight mb-0.5 truncate">
+            ${ticket.eventName}
+          </h3>
+          <p class="text-xs text-zinc-500">${ticket.ticketTier}</p>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center
+                    font-bold text-xs shrink-0 ml-2">
+          ${ticket.attendeeName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()}
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-2 text-xs text-zinc-400">
+          <iconify-icon icon="lucide:calendar" width="12"></iconify-icon>
+          <span>${eventDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-zinc-400">
+          <iconify-icon icon="lucide:map-pin" width="12"></iconify-icon>
+          <span class="truncate">${ticket.eventLocation || "Online"}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-zinc-800/50 px-4 py-3 flex justify-between items-center border-t border-white/5">
+      <div>
+        <p class="text-[9px] font-semibold text-zinc-500 uppercase tracking-wider">Ticket ID</p>
+        <p class="mono text-xs font-semibold text-white mt-0.5">${ticket.id}</p>
+      </div>
+      <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+        <iconify-icon icon="lucide:qr-code" class="text-black" width="20"></iconify-icon>
+      </div>
+    </div>
+
+    ${isPast && !isPending ? `
+    <div class="absolute top-3 right-3 px-2 py-0.5 bg-zinc-800 border border-white/10 rounded
+                text-[9px] text-zinc-400 uppercase tracking-wider">Past</div>` : ""}
+  </div>`;
+}
+
+function renderTemplatedTicket(ticket, template) {
+  const eventDate = new Date(ticket.eventDate);
+  const isPast    = eventDate < new Date();
+  const isPending = ticket.transferStatus === "pending";
+
+  const labelsHTML = (template.labels || []).map(label => {
+    const dataMap = {
+      ATTENDEE_NAME: ticket.attendeeName,
+      TICKET_ID:     ticket.id,
+      EVENT_DATE:    eventDate.toLocaleDateString(),
+      QR_CODE:       "🎫"
+    };
+    if (label.type === "QR_CODE") return `
+      <div style="position:absolute;left:${label.x}px;top:${label.y}px;">
+        <div style="width:32px;height:32px;" class="bg-white rounded flex items-center justify-center">
+          <iconify-icon icon="lucide:qr-code" width="20" class="text-black"></iconify-icon>
+        </div>
+      </div>`;
+    return `
+      <div style="position:absolute;left:${label.x}px;top:${label.y}px;font-size:${label.fontSize||32}px;
+                  color:${label.color||"#000"};font-weight:600;">
+        ${dataMap[label.type] || ""}
+      </div>`;
+  }).join("");
+
+  return `
+  <div class="col-span-full ticket-card bg-zinc-900 border border-white/8 rounded-2xl overflow-hidden relative
+              cursor-pointer ${isPast || isPending ? "opacity-60" : ""}"
+       onclick="${isPending ? "" : `openTicketDetail('${ticket.id}')`}">
+    ${isPending ? `<div class="absolute top-3 left-3 z-10"><span class="pending-badge"><iconify-icon icon="lucide:lock" width="9"></iconify-icon> Transfer Pending</span></div>` : ""}
+    <div style="position:relative;width:1024px;max-width:100%;height:331px;background:#18181b;overflow:hidden;margin:0 auto;">
+      ${template.backgroundImage ? `<img src="${template.backgroundImage}" class="absolute inset-0 w-full h-full object-cover opacity-50">` : ""}
+      <div class="absolute inset-0" style="transform:scale(0.5);transform-origin:top left;width:2048px;height:662px;">
+        ${labelsHTML}
+      </div>
+    </div>
+    ${isPast ? `<div class="absolute top-3 right-3 px-2 py-0.5 bg-zinc-800 border border-white/10 rounded text-[9px] text-zinc-400 uppercase tracking-wider">Past</div>` : ""}
+  </div>`;
+}
+
+function renderActiveTickets() {
+  const tickets   = getActiveTickets();
+  const container = document.getElementById("activeTicketsList");
+
+  if (!tickets.length) {
+    container.innerHTML = `
+      <div class="col-span-full text-center py-20">
+        <div class="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+          <iconify-icon icon="lucide:ticket" width="22" class="text-zinc-600"></iconify-icon>
+        </div>
+        <h3 class="text-base font-semibold mb-1">No Upcoming Events</h3>
+        <p class="text-sm text-zinc-500 mb-6">You don't have any active tickets yet</p>
+        <a href="events.html"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-white text-black text-sm font-bold rounded-xl hover:bg-zinc-200">
+          <iconify-icon icon="lucide:search" width="14"></iconify-icon> Browse Events
+        </a>
+      </div>`;
+    return;
+  }
+  container.innerHTML = tickets.map(renderTicketCard).join("");
+}
+
+function renderPastTickets() {
+  const tickets   = getPastTickets();
+  const container = document.getElementById("pastTicketsList");
+
+  if (!tickets.length) {
+    container.innerHTML = `
+      <div class="col-span-full text-center py-20">
+        <div class="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+          <iconify-icon icon="lucide:archive" width="22" class="text-zinc-600"></iconify-icon>
+        </div>
+        <h3 class="text-base font-semibold mb-1">No Past Events</h3>
+        <p class="text-sm text-zinc-500">Your attended events will appear here</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = tickets.map(renderTicketCard).join("");
+}
+
+function updateStats() {
+  const all    = getUserBookings();
+  const active = getActiveTickets();
+  document.getElementById("totalTicketsCount").textContent  = all.length;
+  document.getElementById("upcomingEventsCount").textContent = active.length;
+  const spent = all.reduce((s, t) => s + (t.ticketPrice || 0), 0);
+  document.getElementById("totalSpent").textContent = `₦${spent.toLocaleString()}`;
+}
+
+/* =========================
+   TAB SWITCHING
+========================= */
+
+function switchTab(tab) {
+  document.getElementById("activeTab").classList.toggle("tab-active",   tab === "active");
+  document.getElementById("activeTab").classList.toggle("text-zinc-500", tab !== "active");
+  document.getElementById("pastTab").classList.toggle("tab-active",     tab === "past");
+  document.getElementById("pastTab").classList.toggle("text-zinc-500",  tab !== "past");
+  document.getElementById("activeTicketsSection").classList.toggle("hidden", tab !== "active");
+  document.getElementById("pastTicketsSection").classList.toggle("hidden",   tab !== "past");
+  if (tab === "past") renderPastTickets();
+}
+
+/* =========================
+   TICKET DETAIL MODAL
+========================= */
+
+function openTicketDetail(ticketId) {
+  const ticket = getUserBookings().find(t => t.id === ticketId);
+  if (!ticket) return;
+  currentTicket = ticket;
+
+  const isPending = ticket.transferStatus === "pending";
+  const eventDate = new Date(ticket.eventDate);
+
+  document.getElementById("modalEventName").textContent    = ticket.eventName;
+  document.getElementById("modalTicketId").textContent     = ticket.id;
+  document.getElementById("modalEventDate").textContent    = eventDate.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+  document.getElementById("modalEventLocation").textContent = ticket.eventLocation || "Online Event";
+  document.getElementById("modalTicketTier").textContent   = ticket.ticketTier;
+  document.getElementById("modalTicketPrice").textContent  = `₦${(ticket.ticketPrice || 0).toLocaleString()}`;
+
+  // Pending state
+  document.getElementById("modalPendingBadge").classList.toggle("hidden", !isPending);
+  document.getElementById("modalPendingNotice").classList.toggle("hidden", !isPending);
+  if (isPending) {
+    document.getElementById("modalPendingTo").textContent = ticket.transferTo || "receiver";
+  }
+
+  // Disable transfer button if pending
+  const transferBtn = document.getElementById("transferBtn");
+  if (isPending) {
+    transferBtn.disabled = true;
+    transferBtn.classList.add("opacity-40", "cursor-not-allowed");
+  } else {
+    transferBtn.disabled = false;
+    transferBtn.classList.remove("opacity-40", "cursor-not-allowed");
+  }
+
+  // QR Code
+  const qrContainer = document.getElementById("qrCodeContainer");
+  qrContainer.innerHTML = "";
+  new QRCode(qrContainer, {
+    text: ticket.id, width: 192, height: 192,
+    colorDark: "#000000", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  document.getElementById("ticketDetailModal").classList.remove("hidden");
+}
+
+function closeTicketDetail() {
+  document.getElementById("ticketDetailModal").classList.add("hidden");
+  currentTicket = null;
+}
+
+function cancelPendingTransfer() {
+  if (!currentTicket) return;
+  if (!confirm("Cancel this pending transfer? The ticket will be unlocked.")) return;
+
+  const bookings = getUserBookings();
+  const ticket   = bookings.find(t => t.id === currentTicket.id);
+  if (ticket) {
+    ticket.transferStatus = null;
+    delete ticket.transferTo;
+    saveUserBookings(bookings);
+  }
+
+  closeTicketDetail();
+  renderActiveTickets();
+  updateStats();
+}
+
+/* =========================
+   TRANSFER MODAL — STEP 1
+========================= */
+
+let _transferStep = 1;
+
+function openTransferModal() {
+  if (!currentTicket) return;
+  if (currentTicket.transferStatus === "pending") return;
+
+  transferReceiverUser = null;
+  _transferStep = 1;
+
+  // Populate ticket summary
+  document.getElementById("transferTicketName").textContent = currentTicket.eventName;
+  document.getElementById("transferTicketTier").textContent = currentTicket.ticketTier;
+
+  // Reset step UI
+  showTransferStep(1);
+  resetReceiverInput();
+
+  document.getElementById("transferModal").classList.remove("hidden");
+}
+
+function closeTransferModal() {
+  document.getElementById("transferModal").classList.add("hidden");
+  transferReceiverUser = null;
+  resetReceiverInput();
+  document.getElementById("transferPasswordInput").value = "";
+  showValidationMsg("passwordValidationMsg", "", "");
+}
+
+function showTransferStep(step) {
+  _transferStep = step;
+  document.getElementById("transferStep1").classList.toggle("hidden", step !== 1);
+  document.getElementById("transferStep2").classList.toggle("hidden", step !== 2);
+  document.getElementById("stepDot1").classList.toggle("active", step === 1);
+  document.getElementById("stepDot2").classList.toggle("active", step === 2);
+  document.getElementById("transferSubtitle").textContent =
+    step === 1 ? "Enter the receiver's unique ID" : "Confirm with your password";
+}
+
+function backToTransferStep1() {
+  showTransferStep(1);
+  document.getElementById("transferPasswordInput").value = "";
+  showValidationMsg("passwordValidationMsg", "", "");
+}
+
+/* ── Receiver ID input & validation ── */
+
+function onReceiverIdInput(input) {
+  // Auto-uppercase + auto-insert hyphen
+  let v = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+  input.value = v;
+
+  const toStep2Btn = document.getElementById("toStep2Btn");
+  toStep2Btn.disabled = true;
+  transferReceiverUser = null;
+
+  hideReceiverPreview();
+  showValidationMsg("receiverValidationMsg", "", "");
+
+  if (v.length < 11) return; // ATT-XXXXXXX = 11 chars
+
+  validateReceiverId(v);
+}
+
+function validateReceiverId(uniqueId) {
+  const currentUser = getCurrentUserObj();
+
+  // Can't transfer to yourself
+  if (uniqueId === currentUser?.uniqueId) {
+    showValidationMsg("receiverValidationMsg", "You can't transfer a ticket to yourself.", "error");
+    setInputState("receiverUniqueIdInput", "error");
+    return;
+  }
+
+  // Look up in registry
+  const receiver = findUserByUniqueId(uniqueId);
+
+  if (!receiver) {
+    showValidationMsg("receiverValidationMsg", "No account found with this ID. Check the ID and try again.", "error");
+    setInputState("receiverUniqueIdInput", "error");
+    return;
+  }
+
+  // Must be attendee
+  if (receiver.role !== "attendee") {
+    showValidationMsg("receiverValidationMsg", "Tickets can only be transferred to attendee accounts.", "error");
+    setInputState("receiverUniqueIdInput", "error");
+    return;
+  }
+
+  // Valid!
+  transferReceiverUser = receiver;
+  setInputState("receiverUniqueIdInput", "success");
+  showValidationMsg("receiverValidationMsg", `Found: ${receiver.firstName} ${receiver.lastName}`, "success");
+  showReceiverPreview(receiver);
+  document.getElementById("toStep2Btn").disabled = false;
+}
+
+function showReceiverPreview(receiver) {
+  const preview  = document.getElementById("receiverPreview");
+  const initials = `${receiver.firstName?.[0] || ""}${receiver.lastName?.[0] || ""}`.toUpperCase() || "?";
+  document.getElementById("receiverInitials").textContent  = initials;
+  document.getElementById("receiverName").textContent      = `${receiver.firstName} ${receiver.lastName}`.trim();
+  document.getElementById("receiverRoleLabel").textContent = `Attendee · ${receiver.uniqueId}`;
+  preview.classList.remove("hidden");
+}
+
+function hideReceiverPreview() {
+  document.getElementById("receiverPreview").classList.add("hidden");
+}
+
+function resetReceiverInput() {
+  document.getElementById("receiverUniqueIdInput").value = "";
+  document.getElementById("receiverUniqueIdInput").className = "field-input mono-input";
+  hideReceiverPreview();
+  showValidationMsg("receiverValidationMsg", "", "");
+  document.getElementById("toStep2Btn").disabled = true;
+}
+
+/* =========================
+   TRANSFER MODAL — STEP 2
+========================= */
+
+function goToTransferStep2() {
+  if (!transferReceiverUser || !currentTicket) return;
+
+  // Populate confirmation summary
+  document.getElementById("confirmTicketName").textContent   = currentTicket.eventName;
+  document.getElementById("confirmReceiverName").textContent = `${transferReceiverUser.firstName} ${transferReceiverUser.lastName}`.trim();
+  document.getElementById("confirmReceiverId").textContent   = transferReceiverUser.uniqueId;
+
+  showTransferStep(2);
+  setTimeout(() => document.getElementById("transferPasswordInput").focus(), 100);
+}
+
+function confirmTransfer() {
+  const password     = document.getElementById("transferPasswordInput").value;
+  const confirmBtn   = document.getElementById("confirmTransferBtn");
+  const currentUser  = getCurrentUserObj();
+
+  if (!password) {
+    shakeElement("transferPasswordInput");
+    showValidationMsg("passwordValidationMsg", "Please enter your password.", "error");
+    return;
+  }
+
+  // Verify password against stored accounts
+  // Passwords are stored in entriqs_accounts keyed by email
+  const passwordValid = verifyCurrentUserPassword(password);
+
+  if (!passwordValid) {
+    shakeElement("transferPasswordInput");
+    setInputState("transferPasswordInput", "error");
+    showValidationMsg("passwordValidationMsg", "Incorrect password. Please try again.", "error");
+    document.getElementById("transferPasswordInput").value = "";
+    return;
+  }
+
+  // ── Execute transfer ──
+  // 1. Lock ticket on sender side
+  const bookings = getUserBookings();
+  const ticket   = bookings.find(t => t.id === currentTicket.id);
+  if (!ticket) return;
+
+  ticket.transferStatus = "pending";
+  ticket.transferTo     = transferReceiverUser.uniqueId;
+  saveUserBookings(bookings);
+
+  // 2. Send notification to receiver
+  sendTransferNotification({
+    toUserId:   transferReceiverUser.id,
+    fromUser:   currentUser,
+    ticket:     ticket
+  });
+
+  // 3. Close modal + refresh UI
+  closeTransferModal();
+  closeTicketDetail();
+  renderActiveTickets();
+  updateStats();
+
+  // 4. Success toast
+  showToast(`Transfer sent to ${transferReceiverUser.firstName}! Waiting for acceptance.`, "success");
+}
+
+/* =========================
+   PASSWORD VERIFICATION
+========================= */
+
+/**
+ * Verifies the current user's password against the stored account registry.
+ * Accounts are stored in entriqs_accounts as { [email]: { password, ... } }
+ * This is front-end only — replace with API call when backend is ready.
+ */
+function verifyCurrentUserPassword(inputPassword) {
+  const user = getCurrentUserObj();
+  if (!user?.email) return false;
+  try {
+    const accounts = JSON.parse(localStorage.getItem("entriqs_accounts") || "{}");
+    const account  = accounts[user.email.toLowerCase()];
+    if (!account) return false;
+    return account.password === inputPassword;
+  } catch {
+    return false;
+  }
+}
+
+/* =========================
+   PALS MANAGER
+========================= */
+
+async function getPals() {
+  try {
+    const token = localStorage.getItem("entriqs_token");
+    const res = await fetch("https://entriqs-backend.onrender.com/api/attendee/pals", {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const data = await res.json();
+    return data.pals || [];
+  } catch { return []; }
+}
+
+async function openPalsManager() {
+  document.getElementById("palsManagerModal").classList.remove("hidden");
+  await renderPalsManagerList();
+}
+
+async function closePalsManager() {
+  document.getElementById("palsManagerModal").classList.add("hidden");
+  document.getElementById("addPalUniqueId").value = "";
+  showValidationMsg("addPalMsg", "", "");
+}
+
+async function addPalByUniqueId() {
+  const input    = document.getElementById("addPalUniqueId");
+  const uniqueId = input.value.trim().toUpperCase();
+
+  if (!uniqueId || uniqueId.length < 11) {
+    showValidationMsg("addPalMsg", "Please enter a valid unique ID (e.g. ATT-XXXXXXX).", "error");
+    return;
+  }
+
+  const currentUser = getCurrentUserObj();
+  if (uniqueId === currentUser?.uniqueId) {
+    showValidationMsg("addPalMsg", "You can't add yourself as a pal.", "error");
+    return;
+  }
+
+  const pals = await getPals();
+  if (pals.some(p => p.unique_id === uniqueId)) {
+    showValidationMsg("addPalMsg", "This person is already in your pals list.", "error");
+    return;
+  }
+
+  // 👇 Backend call handles everything
+  try {
+    showValidationMsg("addPalMsg", "Looking up user...", "info");
+
+    const token = localStorage.getItem("entriqs_token");
+    const res = await fetch("https://entriqs-backend.onrender.com/api/attendee/pals", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ uniqueId })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showValidationMsg("addPalMsg", data.error || "Failed to add pal.", "error");
+      return;
+    }
+
+    input.value = "";
+    showValidationMsg("addPalMsg", `${data.pal.first_name} ${data.pal.last_name} added to your pals!`, "success");
+    await renderPalsManagerList();
+
+  } catch (err) {
+    console.error("Add pal error:", err);
+    showValidationMsg("addPalMsg", "Failed to add pal. Try again.", "error");
+  }
+}
+
+async function removePal(palId) {
+  if (!confirm("Remove this pal?")) return;
+  try {
+    const token = localStorage.getItem("entriqs_token");
+    const res = await fetch(`https://entriqs-backend.onrender.com/api/attendee/pals/${palId}`, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Failed to remove pal");
+    await renderPalsManagerList();
+  } catch (err) {
+    alert("Failed to remove pal: " + err.message);
+  }
+}
+
+async function renderPalsManagerList() {
+  const container = document.getElementById("palsManagerList");
+  container.innerHTML = `<p class="text-center py-4 text-zinc-500 text-xs">Loading...</p>`;
+
+  const pals = await getPals();
+
+  if (!pals.length) {
+    container.innerHTML = `
+      <div class="text-center py-10 text-zinc-600 text-sm">
+        <iconify-icon icon="lucide:users" width="28" class="mb-2 block mx-auto text-zinc-700"></iconify-icon>
+        No pals added yet.<br>Add by their unique ID above.
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = pals.map(pal => {
+    const initials = `${pal.first_name?.[0] || ""}${pal.last_name?.[0] || ""}`.toUpperCase();
+    return `
+    <div class="flex items-center justify-between p-3 bg-zinc-800/50 rounded-xl border border-white/8">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30
+                    text-indigo-400 flex items-center justify-center text-xs font-bold">
+          ${initials || "?"}
+        </div>
+        <div>
+          <p class="text-sm font-medium">${pal.first_name} ${pal.last_name}</p>
+          <p class="mono text-[10px] text-zinc-500">${pal.unique_id}</p>
+        </div>
+      </div>
+      <button onclick="removePal('${pal.id}')" class="text-zinc-600 hover:text-red-400 transition-colors">
+        <iconify-icon icon="lucide:trash-2" width="15"></iconify-icon>
+      </button>
+    </div>`;
+  }).join("");
+}
+
+/* =========================
+   UI HELPERS
+========================= */
+
+function showValidationMsg(elId, message, type) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!message) { el.style.display = "none"; el.textContent = ""; return; }
+  el.style.display = "flex";
+  el.className     = `validation-msg ${type}`;
+  const icon = type === "success" ? "lucide:check-circle" : "lucide:alert-circle";
+  el.innerHTML     = `<iconify-icon icon="${icon}" width="11"></iconify-icon> ${message}`;
+}
+
+function setInputState(inputId, state) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  el.classList.remove("error", "success");
+  if (state) el.classList.add(state);
+}
+
+function shakeElement(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.classList.remove("shake");
+  void el.offsetWidth; // reflow
+  el.classList.add("shake");
+  el.addEventListener("animationend", () => el.classList.remove("shake"), { once: true });
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isHidden = input.type === "password";
+  input.type = isHidden ? "text" : "password";
+  btn.querySelector("iconify-icon").setAttribute("icon", isHidden ? "lucide:eye-off" : "lucide:eye");
+}
+
+function showToast(message, type = "success") {
+  const existing = document.getElementById("toastNotification");
+  if (existing) existing.remove();
+
+  const colors = {
+    success: "bg-emerald-500/20 border-emerald-500/40 text-emerald-300",
+    error:   "bg-red-500/20 border-red-500/40 text-red-300",
+    info:    "bg-indigo-500/20 border-indigo-500/40 text-indigo-300"
+  };
+  const icons = { success: "lucide:check-circle", error: "lucide:x-circle", info: "lucide:info" };
+
+  const toast = document.createElement("div");
+  toast.id    = "toastNotification";
+  toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-xl border
+                     ${colors[type]} text-sm font-medium flex items-center gap-2 shadow-xl
+                     transition-all duration-300 opacity-0 translate-y-2`;
+  toast.innerHTML = `<iconify-icon icon="${icons[type]}" width="15"></iconify-icon> ${message}`;
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.remove("opacity-0", "translate-y-2");
+  });
+
+  setTimeout(() => {
+    toast.classList.add("opacity-0", "translate-y-2");
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+/* =========================
+   CALENDAR
+========================= */
+
+function addToCalendar() {
+  document.getElementById("calendarReminderModal").classList.remove("hidden");
+}
+
+function closeCalendarReminderModal() {
+  document.getElementById("calendarReminderModal").classList.add("hidden");
+}
+
+function confirmAddToCalendar() {
+  if (!currentTicket) return;
+  const startDate = new Date(currentTicket.eventDate);
+  const endDate   = new Date(startDate.getTime() + 3 * 3600000);
+  const fmt       = d => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+  const url = new URL("https://calendar.google.com/calendar/render");
+  url.searchParams.append("action", "TEMPLATE");
+  url.searchParams.append("text", currentTicket.eventName);
+  url.searchParams.append("dates", `${fmt(startDate)}/${fmt(endDate)}`);
+  url.searchParams.append("details",
+    `🎫 Ticket ID: ${currentTicket.id}\n🎟️ Tier: ${currentTicket.ticketTier}\n📍 ${currentTicket.eventLocation || "Online"}`);
+  url.searchParams.append("location", currentTicket.eventLocation || "Online Event");
+
+  window.open(url.toString(), "_blank");
+  closeCalendarReminderModal();
+}
+
+/* =========================
+   DOWNLOAD / SHARE
+========================= */
+
+function downloadTicket() {
+  showToast(`Download coming soon — will generate a PDF with QR code.`, "info");
+}
+
+function shareTicket() {
+  if (!currentTicket) return;
+  if (navigator.share) {
+    navigator.share({ title: currentTicket.eventName, text: `My ticket for ${currentTicket.eventName}`, url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(`${window.location.origin}/ticket/${currentTicket.id}`);
+    showToast("Ticket link copied to clipboard!", "success");
+  }
+}
+
+/* =========================
+   NAV / PROFILE DROPDOWN
+========================= */
+
+const profileBtn      = document.getElementById("profileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+const logoutBtn       = document.getElementById("logoutBtn");
+
+if (profileBtn) {
+  profileBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    profileDropdown.classList.toggle("hidden");
+  });
+}
+if (logoutBtn) logoutBtn.addEventListener("click", logout);
+
+document.addEventListener("click", e => {
+  if (!e.target.closest("#profileBtn")) profileDropdown?.classList.add("hidden");
+});
+
+/* =========================
+   INIT
+========================= */
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // Load fresh user data from backend
+  try {
+    const token = localStorage.getItem("entriqs_token");
+    if (token) {
+      const res = await fetch("https://entriqs-backend.onrender.com/api/auth/me", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        // Update session with fresh backend data
+        const session = JSON.parse(localStorage.getItem("userSession") || "{}");
+        session.user = { ...session.user, ...data.user };
+        localStorage.setItem("userSession", JSON.stringify(session));
+
+        // Show unique ID in nav dropdown
+        const uniqueIdEl = document.getElementById("uniqueIdDisplay");
+        if (uniqueIdEl) uniqueIdEl.textContent = data.user.unique_id || "—";
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load user data:", err);
+  }
+
+  updateStats();
+  renderActiveTickets();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout – Entriqs</title>
+
+<script>
+  window.PAGE_MODE = "protected";
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<style>
+  body {
+    background: linear-gradient(to bottom, #050505, #0a0a0a);
+  }
+
+  .glass {
+    background: rgba(10, 10, 10, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-panel {
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .custom-radio:checked ~ div {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .custom-radio:checked ~ div .radio-circle {
+    border-color: white;
+    background: white;
+    box-shadow: inset 0 0 0 3px #18181b;
+  }
+
+  .radio-circle { transition: all 0.2s; }
+
+  .fade-enter { animation: fadeIn 0.3s ease-out; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+<body class="bg-[#050505] text-white min-h-screen">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 glass">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+    <a href="index.html" class="flex gap-2 items-center">
+      <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold">EN</div>
+      <span class="hidden sm:block font-semibold">ENTRIQS</span>
+    </a>
+    <div class="flex items-center gap-6 text-xs uppercase tracking-wider text-zinc-400">
+      <a href="events.html" class="hover:text-white transition-colors">Back to Events</a>
+    </div>
+  </div>
+</nav>
+
+<main class="pt-24 pb-12 max-w-6xl mx-auto px-6 fade-enter">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <button onclick="window.location.href='events.html'" class="text-zinc-500 hover:text-white text-xs flex items-center gap-1 mb-2 transition-colors">
+      <iconify-icon icon="lucide:arrow-left"></iconify-icon> Back to Events
+    </button>
+    <h1 class="text-2xl font-semibold tracking-tight text-white">Checkout</h1>
+  </div>
+
+  <!-- Checkout Form (hidden/replaced if organizer) -->
+  <div id="checkoutForm">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- Left Column -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- Contact Information -->
+        <div class="glass-panel rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+              <iconify-icon icon="lucide:user-circle" width="18"></iconify-icon>
+            </div>
+            <h3 class="text-sm font-semibold text-white">Contact Information</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="text-xs text-zinc-400">Full Name</label>
+              <div class="w-full bg-zinc-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white" id="userFullName">—</div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs text-zinc-400">Email Address</label>
+              <div class="w-full bg-zinc-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white" id="userEmail">—</div>
+            </div>
+          </div>
+          <p class="text-xs text-zinc-500 mt-4 flex items-center gap-2">
+            <iconify-icon icon="lucide:info" width="14"></iconify-icon>
+            Ticket confirmation will be sent to your registered email
+          </p>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="glass-panel rounded-xl p-6" id="paymentMethodSection">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <iconify-icon icon="lucide:wallet" width="18"></iconify-icon>
+            </div>
+            <h3 class="text-sm font-semibold text-white">Payment Method</h3>
+          </div>
+          <div class="space-y-3">
+            <!-- Card -->
+            <label class="block relative cursor-pointer group">
+              <input type="radio" name="payment" class="custom-radio peer sr-only" value="card" checked>
+              <div class="p-4 rounded-xl border border-white/10 bg-zinc-900/50 flex items-center justify-between transition-all hover:border-white/20">
+                <div class="flex items-center gap-4">
+                  <div class="radio-circle w-5 h-5 rounded-full border border-zinc-600 transition-all"></div>
+                  <div>
+                    <span class="text-sm font-medium text-white block">Pay with Card</span>
+                    <span class="text-xs text-zinc-500">Secured by Paystack / Flutterwave</span>
+                  </div>
+                </div>
+                <div class="flex gap-2 opacity-60 grayscale group-hover:grayscale-0 transition-all">
+                  <div class="h-6 w-9 bg-white rounded flex items-center justify-center relative overflow-hidden">
+                    <div class="w-4 h-4 bg-red-500 rounded-full opacity-80 -ml-1"></div>
+                    <div class="w-4 h-4 bg-orange-400 rounded-full opacity-80 -ml-2"></div>
+                  </div>
+                  <div class="h-6 w-9 bg-[#1a1f71] rounded flex items-center justify-center">
+                    <span class="text-[6px] text-white font-bold italic">VISA</span>
+                  </div>
+                </div>
+              </div>
+            </label>
+            <!-- Bank Transfer -->
+            <label class="block relative cursor-pointer">
+              <input type="radio" name="payment" class="custom-radio peer sr-only" value="bank">
+              <div class="p-4 rounded-xl border border-white/10 bg-zinc-900/50 flex items-center justify-between transition-all hover:border-white/20">
+                <div class="flex items-center gap-4">
+                  <div class="radio-circle w-5 h-5 rounded-full border border-zinc-600 transition-all"></div>
+                  <div>
+                    <span class="text-sm font-medium text-white block">Bank Transfer</span>
+                    <span class="text-xs text-zinc-500">Transfer to temporary virtual account</span>
+                  </div>
+                </div>
+                <iconify-icon icon="lucide:landmark" class="text-zinc-500" width="24"></iconify-icon>
+              </div>
+            </label>
+            <!-- USSD -->
+            <label class="block relative cursor-pointer">
+              <input type="radio" name="payment" class="custom-radio peer sr-only" value="ussd">
+              <div class="p-4 rounded-xl border border-white/10 bg-zinc-900/50 flex items-center justify-between transition-all hover:border-white/20">
+                <div class="flex items-center gap-4">
+                  <div class="radio-circle w-5 h-5 rounded-full border border-zinc-600 transition-all"></div>
+                  <div>
+                    <span class="text-sm font-medium text-white block">USSD</span>
+                    <span class="text-xs text-zinc-500">*737#, *901#, *919# and more</span>
+                  </div>
+                </div>
+                <iconify-icon icon="lucide:phone" class="text-zinc-500" width="24"></iconify-icon>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Summary -->
+      <div class="lg:col-span-4">
+        <div class="glass-panel rounded-xl p-6 sticky top-24">
+          <h3 class="text-sm font-semibold text-white mb-4">Order Summary</h3>
+          <div class="flex gap-3 mb-6 pb-6 border-b border-white/5">
+            <img id="summaryEventImage" src="" class="w-16 h-16 rounded-lg object-cover bg-zinc-800">
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-medium text-white line-clamp-1" id="summaryEventName">—</h4>
+              <div class="text-xs text-zinc-500 mt-1" id="summaryEventDate">—</div>
+              <div class="text-xs text-zinc-500" id="summaryEventLocation">—</div>
+            </div>
+          </div>
+          <div class="space-y-3 mb-6" id="selectedTicketsList"></div>
+          <div class="flex justify-between items-end mb-6 pt-4 border-t border-white/10">
+            <span class="text-sm font-semibold text-white">Total Amount</span>
+            <span class="text-xl font-bold text-white font-mono" id="totalAmount">₦0</span>
+          </div>
+          <button onclick="processPayment()"
+            class="w-full py-3 bg-white text-black rounded-xl text-sm font-bold hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5 flex items-center justify-center gap-2">
+            <iconify-icon icon="lucide:credit-card"></iconify-icon>
+            Pay <span id="payButtonAmount">₦0</span>
+          </button>
+          <div class="mt-4 flex justify-center items-center gap-2 text-[10px] text-zinc-500">
+            <iconify-icon icon="lucide:shield-check" class="text-green-500"></iconify-icon>
+            <span>Secured Payment Processing</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Organizer blocked state (injected by JS if needed) -->
+  <div id="organizerBlocked" class="hidden flex flex-col items-center justify-center py-24 text-center">
+    <div class="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6">
+      <iconify-icon icon="lucide:ban" width="28" class="text-red-400"></iconify-icon>
+    </div>
+    <h2 class="text-xl font-bold text-white mb-2">Organizer Account Detected</h2>
+    <p class="text-zinc-400 text-sm max-w-sm mb-1">
+      You need an attendee account to purchase tickets.
+    </p>
+    <p class="text-zinc-500 text-xs max-w-sm mb-8">
+      Organizer accounts are for creating and managing events only. To buy tickets, please sign in with an attendee account.
+    </p>
+    <div class="flex gap-3">
+      <button onclick="window.location.href='events.html'"
+        class="px-5 py-2.5 bg-zinc-800 text-white text-sm font-medium rounded-xl border border-white/10 hover:bg-zinc-700 transition-colors">
+        Back to Events
+      </button>
+      <button onclick="logout()"
+        class="px-5 py-2.5 bg-white text-black text-sm font-bold rounded-xl hover:bg-zinc-200 transition-colors">
+        Switch Account
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script src="auth.js"></script>
+<script>
+
+let checkoutData = null;
+
+/* =========================
+   ROLE CHECK
+========================= */
+
+function isOrganizerUser() {
+  return userSession?.user?.role === "organizer";
+}
+
+function showOrganizerBlocked() {
+  document.getElementById("checkoutForm").classList.add("hidden");
+  document.getElementById("organizerBlocked").classList.remove("hidden");
+}
+
+/* =========================
+   LOAD CHECKOUT DATA
+========================= */
+
+function loadCheckoutData() {
+  const stored = sessionStorage.getItem("checkoutData");
+  if (!stored) {
+    alert("No booking data found. Redirecting to events...");
+    window.location.href = "events.html";
+    return;
+  }
+
+  try {
+    checkoutData = JSON.parse(stored);
+    loadUserInfo();
+    populateOrderSummary();
+  } catch (err) {
+    console.error("Failed to load checkout data", err);
+    alert("Invalid booking data. Redirecting...");
+    window.location.href = "events.html";
+  }
+}
+
+function loadUserInfo() {
+  if (!userSession?.user) {
+    alert("Please log in to continue");
+    window.location.href = "index.html#login";
+    return;
+  }
+
+  // 🚫 Organizers cannot purchase tickets
+  if (isOrganizerUser()) {
+    showOrganizerBlocked();
+    return;
+  }
+
+  const user = userSession.user;
+  const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User";
+  document.getElementById("userFullName").textContent = fullName;
+  document.getElementById("userEmail").textContent = user.email || "—";
+}
+
+/* =========================
+   ORDER SUMMARY
+========================= */
+
+function populateOrderSummary() {
+  const { event, selectedTiers } = checkoutData;
+
+  document.getElementById("summaryEventImage").src = event.image || "";
+  document.getElementById("summaryEventName").textContent = event.title;
+
+  const eventDate = new Date(event.startDate);
+  document.getElementById("summaryEventDate").textContent = eventDate.toLocaleDateString(undefined, {
+    month: "short", day: "numeric", year: "numeric"
+  });
+  document.getElementById("summaryEventLocation").textContent =
+    event.format === "Online" ? "Online Event" : event.location;
+
+  const ticketsList = document.getElementById("selectedTicketsList");
+  ticketsList.innerHTML = "";
+  let subtotal = 0;
+
+  selectedTiers.forEach(item => {
+    const tierTotal = item.tier.price * item.quantity;
+    subtotal += tierTotal;
+    ticketsList.insertAdjacentHTML("beforeend", `
+      <div class="flex justify-between text-sm">
+        <span class="text-zinc-400">${item.quantity}x ${item.tier.name}</span>
+        <span class="text-white font-mono">${tierTotal === 0 ? "Free" : "₦" + tierTotal.toLocaleString()}</span>
+      </div>`);
+  });
+
+  const isFree = subtotal === 0;
+
+  if (isFree) {
+    // Free event — no fees, show clean summary
+    document.getElementById("totalAmount").textContent = "Free";
+    document.getElementById("payButtonAmount").textContent = "";
+    document.querySelector("#checkoutForm button[onclick='processPayment()']").innerHTML =
+      `<iconify-icon icon="lucide:ticket"></iconify-icon> Confirm Registration`;
+
+    // Hide payment method section entirely
+    document.getElementById("paymentMethodSection").classList.add("hidden");
+  } else {
+    const serviceFee = Math.round(subtotal * 0.05);
+    ticketsList.insertAdjacentHTML("beforeend", `
+      <div class="flex justify-between text-sm pt-2 border-t border-white/5">
+        <span class="text-zinc-400">Subtotal</span>
+        <span class="text-white font-mono">₦${subtotal.toLocaleString()}</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-zinc-400">Service Fee (5%)</span>
+        <span class="text-white font-mono">₦${Math.round(subtotal * 0.05).toLocaleString()}</span>
+      </div>`);
+
+    const total = subtotal + serviceFee;
+    document.getElementById("totalAmount").textContent = `₦${total.toLocaleString()}`;
+    document.getElementById("payButtonAmount").textContent = `₦${total.toLocaleString()}`;
+  }
+}
+
+/* =========================
+   PAYMENT
+========================= */
+
+function processPayment() {
+  if (isOrganizerUser()) { showOrganizerBlocked(); return; }
+
+  let subtotal = 0;
+  checkoutData.selectedTiers.forEach(item => { subtotal += item.tier.price * item.quantity; });
+  const isFree = subtotal === 0;
+
+  if (!isFree) {
+    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
+    if (!paymentMethod) { alert("Please select a payment method"); return; }
+  }
+
+  const serviceFee = isFree ? 0 : Math.round(subtotal * 0.05);
+  const total = subtotal + serviceFee;
+  const paymentMethod = isFree ? "free" : document.querySelector('input[name="payment"]:checked')?.value;
+
+  const bookings = [];
+  checkoutData.selectedTiers.forEach(item => {
+    for (let i = 0; i < item.quantity; i++) {
+      const ticketId = `TICK-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+      bookings.push({
+        id: ticketId,
+        eventId: checkoutData.event.id,
+        eventName: checkoutData.event.title,
+        eventDate: checkoutData.event.startDate,
+        eventLocation: checkoutData.event.location,
+        eventImage: checkoutData.event.image,
+        ticketTier: item.tier.name,
+        ticketPrice: item.tier.price,
+        attendeeName: `${userSession.user.firstName} ${userSession.user.lastName}`,
+        attendeeEmail: userSession.user.email,
+        paymentMethod,
+        purchaseDate: new Date().toISOString(),
+        status: "confirmed"
+      });
+    }
+  });
+
+  saveBookings(bookings);
+  sessionStorage.removeItem("checkoutData");
+  updateEventStats(checkoutData.selectedTiers, checkoutData.event.id);
+
+  const msg = isFree
+    ? `You're registered! ${bookings.length} ticket(s) confirmed.\n\nTicket IDs:\n${bookings.map(b => b.id).join('\n')}`
+    : `Payment successful! ${bookings.length} ticket(s) confirmed.\n\nTicket IDs:\n${bookings.map(b => b.id).join('\n')}`;
+
+  alert(msg);
+  window.location.href = "attendee.html";
+}
+
+function saveBookings(bookings) {
+  try {
+    const userId = window.userSession?.user?.id;
+    if (!userId) { console.error("No user session found"); return; }
+    const userKey = `userBookings_${userId}`;
+    const existing = JSON.parse(localStorage.getItem(userKey) || "[]");
+    existing.push(...bookings);
+    localStorage.setItem(userKey, JSON.stringify(existing));
+    console.log(`✅ Saved ${bookings.length} ticket(s) for user ${userId}`);
+  } catch (err) {
+    console.error("Failed to save bookings", err);
+  }
+}
+
+function updateEventStats(selectedTiers, eventId) {
+  try {
+    const raw = localStorage.getItem("entriqs_events");
+    if (!raw) return;
+
+    const events = JSON.parse(raw);
+    const event = events[eventId];
+    if (!event) return;
+
+    selectedTiers.forEach(item => {
+      // Update event-level totals
+      event.ticketsSold = (event.ticketsSold || 0) + item.quantity;
+      event.revenue     = (event.revenue     || 0) + (item.tier.price * item.quantity);
+
+      // Update the specific tier's sold count
+      const tier = event.tickets?.find(t => t.name === item.tier.name);
+      if (tier) {
+        tier.sold = (tier.sold || 0) + item.quantity;
+      }
+    });
+
+    localStorage.setItem("entriqs_events", JSON.stringify(events));
+    console.log("✅ Event stats updated");
+  } catch (err) {
+    console.error("Failed to update event stats", err);
+  }
+}
+
+/* =========================
+   INIT
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadCheckoutData();
+});
+</script>
+</body>
+</html>
