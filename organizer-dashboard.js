@@ -865,7 +865,14 @@ async function handleSaveDraft(form) {
 function openCreateEventForm() {
   closeEditModal();
   currentEditingEventId = null;
+  currentEventSubtype = "public";
   currentInviteTemplate = "default";
+// Reset template card selection
+document.querySelectorAll(".invite-template-card").forEach((c, i) => {
+  c.classList.toggle("selected", i === 0);
+  c.classList.toggle("border-white", i === 0);
+  c.classList.toggle("border-white/10", i !== 0);
+});
 
   // Reset all fields
   document.getElementById("ol_eventName").value = "";
@@ -2143,6 +2150,22 @@ function addInviteAttendee() {
 function removeInviteAttendee(index) {
   inviteAttendees.splice(index, 1);
   renderInviteAttendeeList();
+}
+
+
+function selectInviteTemplate(template, card) {
+  currentInviteTemplate = template;
+
+  // Update card styles
+  document.querySelectorAll(".invite-template-card").forEach(c => {
+    c.classList.remove("selected");
+    c.classList.remove("border-white");
+    c.classList.add("border-white/10");
+  });
+
+  card.classList.add("selected");
+  card.classList.remove("border-white/10");
+  card.classList.add("border-white");
 }
 
 function renderInviteAttendeeList() {

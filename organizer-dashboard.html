@@ -178,6 +178,16 @@
     border-color: rgba(255,255,255,0.3);
     background: rgba(255,255,255,0.02);
   }
+  .invite-template-card.selected {
+    border-color: white;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.3);
+  }
+  .invite-template-card:not(.selected) .template-check {
+    display: none;
+  }
+  .invite-template-card.selected .template-check {
+    display: flex;
+  }
 </style>
 <body class="bg-[#050505] text-white">
 
@@ -956,6 +966,107 @@
           </div>
           <!-- Attendee List -->
           <div id="inviteAttendeeList" class="space-y-2"></div>
+          <!-- Invite Template Picker -->
+          <div class="space-y-3 mt-4">
+            <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+              <iconify-icon icon="lucide:palette" width="13"></iconify-icon>
+              Invite Template
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+
+              <!-- Default Template -->
+              <div onclick="selectInviteTemplate('default', this)"
+                class="invite-template-card selected cursor-pointer rounded-xl border border-white overflow-hidden bg-zinc-950 transition-all"
+                data-template="default">
+                <!-- Thumbnail -->
+                <div class="relative h-24 bg-[#050505] overflow-hidden">
+                  <svg width="100%" height="100%" viewBox="0 0 200 96" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Dark background -->
+                    <rect width="200" height="96" fill="#050505"/>
+                    <!-- Subtle grid -->
+                    <line x1="0" y1="24" x2="200" y2="24" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <line x1="0" y1="48" x2="200" y2="48" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <line x1="0" y1="72" x2="200" y2="72" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <line x1="50" y1="0" x2="50" y2="96" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <line x1="100" y1="0" x2="100" y2="96" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <line x1="150" y1="0" x2="150" y2="96" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    <!-- Card suggestion -->
+                    <rect x="30" y="10" width="140" height="76" rx="6" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+                    <!-- Hero image suggestion -->
+                    <rect x="30" y="10" width="140" height="28" rx="6" fill="#1a1a1a"/>
+                    <rect x="30" y="32" width="140" height="6" fill="#111111"/>
+                    <!-- Event name line -->
+                    <rect x="50" y="46" width="100" height="6" rx="2" fill="rgba(255,255,255,0.15)"/>
+                    <!-- Divider -->
+                    <line x1="60" y1="58" x2="140" y2="58" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+                    <!-- Detail lines -->
+                    <rect x="50" y="64" width="60" height="3" rx="1" fill="rgba(255,255,255,0.08)"/>
+                    <rect x="50" y="70" width="80" height="3" rx="1" fill="rgba(255,255,255,0.08)"/>
+                    <!-- Buttons -->
+                    <rect x="42" y="78" width="48" height="6" rx="2" fill="white" opacity="0.9"/>
+                    <rect x="96" y="78" width="48" height="6" rx="2" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+                  </svg>
+                  <!-- Selected checkmark -->
+                  <div class="template-check absolute top-2 right-2 w-5 h-5 rounded-full bg-white flex items-center justify-center">
+                    <iconify-icon icon="lucide:check" width="10" class="text-black"></iconify-icon>
+                  </div>
+                </div>
+                <!-- Label -->
+                <div class="p-3">
+                  <p class="text-xs font-semibold text-white">Default</p>
+                  <p class="text-[10px] text-zinc-500 mt-0.5">Dark, modern</p>
+                </div>
+              </div>
+
+              <!-- Wedding Template -->
+              <div onclick="selectInviteTemplate('wedding', this)"
+                class="invite-template-card cursor-pointer rounded-xl border border-white/10 overflow-hidden bg-zinc-950 transition-all"
+                data-template="wedding">
+                <!-- Thumbnail -->
+                <div class="relative h-24 overflow-hidden">
+                  <svg width="100%" height="100%" viewBox="0 0 200 96" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Warm ivory background -->
+                    <rect width="200" height="96" fill="#faf6f0"/>
+                    <!-- Card -->
+                    <rect x="30" y="6" width="140" height="84" rx="6" fill="white" stroke="#f5e8e3" stroke-width="0.5"/>
+                    <!-- Hero image suggestion warm -->
+                    <rect x="30" y="6" width="140" height="26" rx="6" fill="#f5e8e3"/>
+                    <!-- Blush overlay on hero -->
+                    <rect x="30" y="24" width="140" height="8" fill="url(#heroFade)"/>
+                    <!-- Gold divider line -->
+                    <line x1="80" y1="38" x2="120" y2="38" stroke="#c9a84c" stroke-width="0.5" opacity="0.6"/>
+                    <!-- Diamond ornament -->
+                    <polygon points="100,35 102,38 100,41 98,38" fill="#c9a84c" opacity="0.6"/>
+                    <!-- Couple name in serif style -->
+                    <rect x="55" y="44" width="90" height="7" rx="1" fill="#d4a5a5" opacity="0.4"/>
+                    <!-- Subtitle line -->
+                    <rect x="65" y="54" width="70" height="3" rx="1" fill="#8a7f7f" opacity="0.2"/>
+                    <!-- Guest section -->
+                    <rect x="55" y="61" width="50" height="4" rx="1" fill="#c9a84c" opacity="0.3"/>
+                    <!-- Buttons -->
+                    <rect x="42" y="78" width="50" height="6" rx="1" fill="#d4a5a5" opacity="0.8"/>
+                    <rect x="98" y="78" width="50" height="6" rx="1" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.6"/>
+                    <defs>
+                      <linearGradient id="heroFade" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f5e8e3" stop-opacity="0"/>
+                        <stop offset="100%" stop-color="white" stop-opacity="1"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <!-- Selected checkmark (hidden by default) -->
+                  <div class="template-check hidden absolute top-2 right-2 w-5 h-5 rounded-full bg-white border border-[#d4a5a5] flex items-center justify-center">
+                    <iconify-icon icon="lucide:check" width="10" class="text-[#d4a5a5]"></iconify-icon>
+                  </div>
+                </div>
+                <!-- Label -->
+                <div class="p-3">
+                  <p class="text-xs font-semibold text-white">Wedding</p>
+                  <p class="text-[10px] text-zinc-500 mt-0.5">Elegant, romantic</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
 
