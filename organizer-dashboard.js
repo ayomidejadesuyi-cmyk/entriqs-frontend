@@ -171,16 +171,18 @@ async function createEvent(payload) {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({
-        name:        payload.name,
-        date:        payload.date,
-        location:    payload.location,
-        category:    payload.category,
-        description: payload.description,
-        eventType:   payload.eventType,
-        eventFormat: payload.eventFormat,
-        imageUrl:    payload.imageUrl,
-        tickets:     payload.tickets,
-        status:      "published"
+        name:           payload.name,
+        date:           payload.date,
+        location:       payload.location,
+        category:       payload.category,
+        description:    payload.description,
+        eventType:      payload.eventType,
+        eventSubtype:   payload.eventSubtype,
+        eventFormat:    payload.eventFormat,
+        imageUrl:       payload.imageUrl,
+        tickets:        payload.tickets,
+        status:         "published",
+        inviteTemplate: payload.inviteTemplate
       })
     });
 
@@ -1660,16 +1662,18 @@ async function saveDraft(payload) {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({
-        name:        payload.name || "Untitled Draft",
-        date:        payload.date,
-        location:    payload.location,
-        category:    payload.category,
-        description: payload.description,
-        eventType:   payload.eventType,
-        eventFormat: payload.eventFormat,
-        imageUrl:    payload.imageUrl,
-        tickets:     payload.tickets,
-        status:      "draft"
+        name:           payload.name || "Untitled Draft",
+        date:           payload.date,
+        location:       payload.location,
+        category:       payload.category,
+        description:    payload.description,
+        eventType:      payload.eventType,
+        eventSubtype:   payload.eventSubtype,
+        eventFormat:    payload.eventFormat,
+        imageUrl:       payload.imageUrl,
+        tickets:        payload.tickets,
+        status:         "draft",
+        inviteTemplate: payload.inviteTemplate
       })
     });
 
