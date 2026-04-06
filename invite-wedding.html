@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kendra & James - Wedding Invitation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Great+Vibes&family=Lato:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @keyframes fadeUpIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes floatPetal {
+            0% { transform: translate(0, -10%) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translate(var(--end-x), 100vh) rotate(var(--end-rot)); opacity: 0; }
+        }
+        .animate-fade-up { animation: fadeUpIn 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        
+        /* Subtle noise texture */
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.025;
+            pointer-events: none;
+        }
+
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-[#faf6f0] text-[#2c2c2c] min-h-screen flex flex-col items-center py-0 sm:py-12 px-0 sm:px-4 antialiased selection:bg-[#d4a5a5] selection:text-white" style="font-family: 'Lato', sans-serif; font-weight: 300;">
+
+    <!-- Petals Container (Active on Accept) -->
+    <div id="petals-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden hidden"></div>
+
+    <!-- Main Invitation Card -->
+    <main class="relative w-full max-w-[560px] bg-white sm:rounded-xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(212,165,165,0.15)] opacity-0 animate-fade-up min-h-screen sm:min-h-0 flex flex-col">
+        
+        <!-- Texture Overlay -->
+        <div class="absolute inset-0 bg-noise z-0 mix-blend-multiply"></div>
+
+        <!-- Hero Section -->
+        <div class="relative h-72 sm:h-80 w-full overflow-hidden bg-[#faf6f0] z-10 shrink-0">
+            <!-- Blurred background layer for container-fit feel -->
+            <img id="heroBg" src="" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-50" aria-hidden="true">
+            <!-- Main focal image -->
+            <img id="heroImg" src="" alt="Event" class="absolute inset-0 w-full h-full object-contain drop-shadow-xl" style="mask-image: linear-gradient(to bottom, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);">
+        </div>
+
+        <!-- Content Area -->
+        <div class="relative z-10 px-6 sm:px-12 pt-8 pb-12 flex flex-col items-center text-center flex-grow bg-gradient-to-b from-transparent to-white via-white via-20%">
+            
+            <!-- Corner Decorative Elements (SVG) -->
+            <svg class="absolute top-4 left-4 w-16 h-16 text-[#c9a84c] opacity-20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 10 Q 50 10 50 50" stroke="currentColor" stroke-width="0.5" fill="none"/>
+                <path d="M10 10 Q 10 50 50 50" stroke="currentColor" stroke-width="0.5" fill="none"/>
+                <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                <circle cx="50" cy="50" r="1" fill="currentColor"/>
+            </svg>
+            <svg class="absolute top-4 right-4 w-16 h-16 text-[#c9a84c] opacity-20 rotate-90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 10 Q 50 10 50 50" stroke="currentColor" stroke-width="0.5" fill="none"/>
+                <path d="M10 10 Q 10 50 50 50" stroke="currentColor" stroke-width="0.5" fill="none"/>
+                <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                <circle cx="50" cy="50" r="1" fill="currentColor"/>
+            </svg>
+
+            <!-- Introductory Header -->
+            <div class="w-[1px] h-10 bg-gradient-to-b from-transparent to-[#c9a84c] mb-6"></div>
+            <p id="organizerLine" class="uppercase tracking-[0.25em] text-xs text-[#8a7f7f] mb-6">Together with their families</p>
+            
+            <!-- Couple Names -->
+            <h1 id="eventName" class="text-4xl sm:text-5xl mb-3 text-[#2c2c2c] tracking-tight" style="font-family: 'Cormorant Garamond', serif; font-weight: 300; line-height: 1.1;">
+                —
+            </h1>
+            
+            <p class="italic text-sm text-[#8a7f7f] mb-8">Request the honour of your presence</p>
+            
+            <!-- Divider -->
+            <div class="flex items-center justify-center gap-4 mb-10 w-full max-w-[200px]">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[#c9a84c] flex-1 opacity-50"></div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="text-[#c9a84c]">
+                    <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor" opacity="0.8"/>
+                </svg>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[#c9a84c] flex-1 opacity-50"></div>
+            </div>
+
+            <!-- Guest Personalization -->
+            <div class="mb-10 flex flex-col items-center w-full">
+                <div id="roleBadge" class="inline-flex items-center justify-center px-4 py-1.5 mb-5 bg-[#faf6f0] border border-[#f5e8e3] rounded-full">
+                    <span id="roleBadgeText" class="text-[#c9a84c] uppercase tracking-[0.2em] text-[10px] font-medium mt-[1px]">Guest</span>
+                </div>
+                <h2 id="guestName" class="text-4xl sm:text-5xl text-[#d4a5a5] tracking-tight leading-none" style="font-family: 'Great Vibes', cursive;">Dear Guest,</h2>
+            </div>
+
+            <!-- Event Details -->
+            <div class="flex flex-col gap-2 mb-12 text-center text-[#2c2c2c] w-full" style="font-family: 'Cormorant Garamond', serif; font-weight: 300;">
+                <p id="eventDate" class="text-xl sm:text-2xl tracking-tight">—</p>
+                <div class="mt-5 pt-5 border-t border-[#f5e8e3]/50 w-3/4 mx-auto">
+                    <p id="eventLocation" class="text-xl tracking-tight">—</p>
+                </div>
+            </div>
+
+            <!-- Personalized Logistics Block -->
+            <div class="w-full bg-white/60 backdrop-blur-sm border border-[#f5e8e3] rounded-sm p-6 mb-10 text-sm flex flex-col gap-4 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.03)] relative overflow-hidden">
+                <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-[#d4a5a5] opacity-40"></div>
+                
+                <div id="seatRow" class="flex justify-between items-center border-b border-[#f5e8e3]/50 pb-4">
+                    <span class="text-[#8a7f7f] uppercase tracking-[0.15em] text-[10px]">Assigned Seating</span>
+                    <span id="seatText" class="text-[#2c2c2c]" style="font-family: 'Cormorant Garamond', serif; font-size: 1.125rem; font-weight: 400;">—</span>
+                </div>
+                <div id="plusOneRow" class="hidden flex justify-between items-center pt-1">
+                    <span class="text-[#8a7f7f] uppercase tracking-[0.15em] text-[10px]">Companions</span>
+                    <span class="text-[#2c2c2c] text-xs">You may bring <span class="italic text-[#d4a5a5]">one</span> guest</span>
+                </div>
+            </div>
+
+            <blockquote id="noteBlock" class="hidden text-[#8a7f7f] text-sm mb-12 relative px-8 italic leading-relaxed">
+                <span class="absolute top-0 left-2 text-3xl text-[#f5e8e3]" style="font-family: 'Cormorant Garamond', serif;">"</span>
+                <span id="noteText"></span>
+                <span class="absolute bottom-[-10px] right-2 text-3xl text-[#f5e8e3] rotate-180" style="font-family: 'Cormorant Garamond', serif;">"</span>
+            </blockquote>
+
+            <!-- Dynamic State Container -->
+            <div id="interaction-area" class="w-full relative min-h-[120px] flex items-center justify-center">
+                
+                <!-- State 1: Pending (Buttons) -->
+                <div id="state-pending" class="w-full flex flex-col sm:flex-row gap-4 justify-center transition-all duration-500 ease-in-out absolute inset-0">
+                    <button onclick="handleResponse('accept')" class="group relative flex-1 bg-[#d4a5a5] text-white py-3.5 px-6 rounded-sm uppercase tracking-[0.15em] text-[10px] sm:text-xs overflow-hidden transition-all duration-500 shadow-[0_8px_20px_-6px_rgba(212,165,165,0.4)] hover:shadow-[0_12px_25px_-6px_rgba(212,165,165,0.6)] hover:-translate-y-0.5">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-out"></div>
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            Joyfully Accept
+                        </span>
+                    </button>
+                    <button onclick="handleResponse('decline')" class="flex-1 border border-[#c9a84c] text-[#c9a84c] bg-transparent hover:bg-[#faf6f0] py-3.5 px-6 rounded-sm uppercase tracking-[0.15em] text-[10px] sm:text-xs transition-colors duration-300">
+                        Regretfully Decline
+                    </button>
+                </div>
+
+                <!-- State 2: Accepted -->
+                <div id="state-accepted" class="w-full flex flex-col items-center opacity-0 pointer-events-none translate-y-4 transition-all duration-700 ease-out absolute top-0">
+                    <h3 class="text-3xl text-[#d4a5a5] mb-2 tracking-tight" style="font-family: 'Great Vibes', cursive;">We are overjoyed!</h3>
+                    <p class="text-xs text-[#8a7f7f] mb-6 tracking-wide">Your response has been warmly received.</p>
+                    
+                    <!-- QR Pass -->
+                    <div class="relative p-1 bg-white border border-[#f5e8e3] shadow-sm rounded-sm mb-3 group hover:border-[#c9a84c] transition-colors duration-500 cursor-default">
+                        <div class="absolute -inset-1 border border-[#c9a84c] opacity-0 group-hover:opacity-30 scale-95 group-hover:scale-100 transition-all duration-500 rounded-sm pointer-events-none"></div>
+                        <div class="p-3 border border-dashed border-[#f5e8e3] relative">
+                            <div id="qrCode"></div>
+                        </div>
+                    </div>
+                    <p class="uppercase tracking-[0.2em] text-[10px] text-[#c9a84c]">Your Entry Pass</p>
+                </div>
+
+                <!-- State 3: Declined -->
+                <div id="state-declined" class="w-full flex flex-col items-center opacity-0 pointer-events-none translate-y-4 transition-all duration-700 ease-out absolute top-0">
+                    <iconify-icon icon="solar:letter-opened-linear" class="text-3xl text-[#8a7f7f] mb-4 opacity-50" style="stroke-width: 1.5;"></iconify-icon>
+                    <p class="text-sm text-[#8a7f7f] mb-6 italic" style="font-family: 'Cormorant Garamond', serif; font-size: 1.25rem;">You will be deeply missed.</p>
+                    <button onclick="resetResponse()" class="text-[#c9a84c] text-[10px] uppercase tracking-[0.1em] underline underline-offset-4 hover:text-[#b8963e] transition-colors">
+                        Changed your mind?
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-[#faf6f0] py-5 text-center border-t border-[#f5e8e3] mt-auto relative z-10">
+            <a href="#" class="inline-flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
+                <span class="text-[9px] text-[#8a7f7f]">POWERED BY</span>
+                <span class="uppercase tracking-[0.15em] text-[10px] text-[#2c2c2c] font-medium">Entriqs</span>
+            </a>
+        </div>
+    </main>
+
+<script>
+const API_URL = "https://entriqs-backend.onrender.com";
+
+function getToken() {
+    return new URLSearchParams(window.location.search).get("token");
+}
+
+function getAuthToken() {
+    return localStorage.getItem("entriqs_token");
+}
+
+function isLoggedIn() {
+    return !!getAuthToken();
+}
+
+function formatDateElegant(dateStr) {
+    if (!dateStr) return "Date to be confirmed";
+    const d = new Date(dateStr);
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const ordinals = ["","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth","eleventh","twelfth","thirteenth","fourteenth","fifteenth","sixteenth","seventeenth","eighteenth","nineteenth","twentieth","twenty-first","twenty-second","twenty-third","twenty-fourth","twenty-fifth","twenty-sixth","twenty-seventh","twenty-eighth","twenty-ninth","thirtieth","thirty-first"];
+    const d2 = d.getDate();
+    const hrs = d.getHours();
+    const mins = d.getMinutes();
+    const timeStr = mins === 0
+        ? `at ${hrs > 12 ? hrs - 12 : hrs} o'clock ${hrs >= 12 ? "in the evening" : "in the morning"}`
+        : `at ${hrs > 12 ? hrs - 12 : hrs}:${String(mins).padStart(2,"0")} ${hrs >= 12 ? "PM" : "AM"}`;
+    return `${days[d.getDay()]}, the ${ordinals[d2]} of ${months[d.getMonth()]} · ${timeStr}`;
+}
+
+// ── State refs ────────────────────────────────────────
+const states = {
+    pending:   document.getElementById('state-pending'),
+    accepted:  document.getElementById('state-accepted'),
+    declined:  document.getElementById('state-declined'),
+    container: document.getElementById('interaction-area')
+};
+const petalsContainer = document.getElementById('petals-container');
+
+function hideAll() {
+    ['pending','accepted','declined'].forEach(key => {
+        states[key].style.opacity      = '0';
+        states[key].style.pointerEvents = 'none';
+        states[key].style.transform    = 'translateY(10px)';
+    });
+}
+
+function showState(key, height) {
+    states.container.style.height = height + 'px';
+    setTimeout(() => {
+        states[key].style.opacity      = '1';
+        states[key].style.pointerEvents = 'auto';
+        states[key].style.transform    = 'translateY(0)';
+    }, 300);
+}
+
+// ── Render ────────────────────────────────────────────
+function renderInvite(invite) {
+    // Hero image
+    if (invite.image_url) {
+        document.getElementById('heroBg').src  = invite.image_url;
+        document.getElementById('heroImg').src = invite.image_url;
+    }
+
+    // Organizer
+    const organizer = invite.organization_name || invite.organizer_first || "The Couple";
+    document.getElementById('organizerLine').textContent = `An invitation from ${organizer}`;
+
+    // Event name
+    document.getElementById('eventName').textContent = invite.event_name;
+
+    // Guest name
+    const firstName = invite.full_name.split(' ')[0];
+    document.getElementById('guestName').textContent = `Dear ${firstName},`;
+
+    // Role badge
+    if (invite.role) {
+        document.getElementById('roleBadgeText').textContent = `${invite.role} Guest`;
+    } else {
+        document.getElementById('roleBadge').classList.add('hidden');
+    }
+
+    // Date
+    document.getElementById('eventDate').textContent = formatDateElegant(invite.event_date);
+
+    // Location
+    document.getElementById('eventLocation').textContent = invite.location || "Venue to be confirmed";
+
+    // Seat
+    if (invite.seat) {
+        document.getElementById('seatText').textContent = invite.seat;
+    } else {
+        document.getElementById('seatRow').classList.add('hidden');
+    }
+
+    // Plus one
+    if (invite.plus_one) {
+        document.getElementById('plusOneRow').classList.remove('hidden');
+    }
+
+    // Note
+    if (invite.note) {
+        document.getElementById('noteText').textContent = invite.note;
+        document.getElementById('noteBlock').classList.remove('hidden');
+    }
+
+    // Render action area based on status
+    if (invite.status === 'accepted') {
+        hideAll();
+        renderAccepted(invite.token);
+    } else if (invite.status === 'declined') {
+        hideAll();
+        showState('declined', 120);
+    } else {
+        if (!isLoggedIn()) {
+            renderAuthPrompt();
+        } else {
+            setTimeout(() => {
+                states.container.style.height = states.pending.offsetHeight + 'px';
+                states.pending.style.position = 'relative';
+            }, 100);
+        }
+    }
+}
+
+function renderAccepted(token) {
+    // Generate real QR code
+    document.getElementById('qrCode').innerHTML = '';
+    new QRCode(document.getElementById('qrCode'), {
+        text: `${window.location.origin}/invite.html?token=${token}`,
+        width: 100,
+        height: 100,
+        colorDark: "#2c2c2c",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+    showState('accepted', 220);
+    triggerPetals();
+}
+
+function renderAuthPrompt() {
+    const token = getToken();
+    states.pending.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;border:1px solid #f5e8e3;background:#faf6f0;text-align:center;">
+            <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#8a7f7f;font-style:italic;margin:0;">
+                Please sign in to confirm your attendance
+            </p>
+            <div style="display:flex;gap:12px;width:100%;">
+                <a href="login.html?redirect=${encodeURIComponent(window.location.href)}"
+                    style="flex:1;background:#d4a5a5;color:white;padding:12px;text-align:center;text-decoration:none;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">
+                    Sign In
+                </a>
+                <a href="signup.html?redirect=${encodeURIComponent(window.location.href)}"
+                    style="flex:1;border:1px solid #c9a84c;color:#c9a84c;padding:12px;text-align:center;text-decoration:none;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">
+                    Create Account
+                </a>
+            </div>
+        </div>`;
+    states.container.style.height = 'auto';
+}
+
+// ── API Calls ─────────────────────────────────────────
+async function handleResponse(type) {
+    const token = getToken();
+    if (!token) return;
+
+    hideAll();
+
+    try {
+        const res  = await fetch(`${API_URL}/api/invite/${token}/respond`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ response: type === 'accept' ? 'accepted' : 'declined' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        if (type === 'accept') {
+            renderAccepted(token);
+        } else {
+            showState('declined', 120);
+        }
+    } catch (err) {
+        console.error("Respond error:", err);
+        // Re-show pending on error
+        showState('pending', states.pending.offsetHeight);
+        alert("Something went wrong. Please try again.");
+    }
+}
+
+function resetResponse() {
+    hideAll();
+    petalsContainer.innerHTML = '';
+    petalsContainer.classList.add('hidden');
+    showState('pending', states.pending.offsetHeight);
+}
+
+// ── Petals ────────────────────────────────────────────
+function triggerPetals() {
+    petalsContainer.classList.remove('hidden');
+    petalsContainer.innerHTML = '';
+    const petalColors = ['#d4a5a5', '#f5e8e3', '#ffffff'];
+
+    for (let i = 0; i < 30; i++) {
+        const petal    = document.createElement('div');
+        const startX   = Math.random() * 100;
+        const endX     = (Math.random() - 0.5) * 50 + startX;
+        const duration = Math.random() * 3 + 4;
+        const delay    = Math.random() * 2;
+        const size     = Math.random() * 10 + 10;
+        const rot      = Math.random() * 360;
+
+        petal.style.cssText = `
+            position: absolute;
+            top: -20px;
+            left: ${startX}vw;
+            width: ${size}px;
+            height: ${size * 1.2}px;
+            background-color: ${petalColors[Math.floor(Math.random() * petalColors.length)]};
+            border-radius: 50% 0 50% 50%;
+            transform: rotate(${Math.random() * 360}deg);
+            opacity: 0;
+            --end-x: ${endX - startX}vw;
+            --end-rot: ${rot + (Math.random() > 0.5 ? 360 : -360)}deg;
+            animation: floatPetal ${duration}s ${delay}s ease-in-out forwards;
+        `;
+        petalsContainer.appendChild(petal);
+    }
+}
+
+// ── Init ──────────────────────────────────────────────
+async function init() {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+        const res  = await fetch(`${API_URL}/api/invite/${token}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        renderInvite(data.invite);
+    } catch (err) {
+        console.error("Load invite error:", err);
+    }
+}
+
+// Initialize container height
+setTimeout(() => {
+    if (states.pending) {
+        states.container.style.height = states.pending.offsetHeight + 'px';
+        states.pending.style.position = 'relative';
+    }
+}, 100);
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
