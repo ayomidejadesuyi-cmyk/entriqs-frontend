@@ -1,504 +1,75 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>You're Invited</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Your Invitation</title>
 <style>
-  body { background: #050505; font-family: 'Inter', sans-serif; }
-
-  .invite-card {
-    background: linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 24px;
-    overflow: hidden;
-    max-width: 420px;
-    width: 100%;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-  }
-
-  .hero-image {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    display: block;
-  }
-
-  .hero-placeholder {
-    width: 100%;
-    height: 220px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  body {
+    margin: 0;
+    background: #050505;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 100vh;
+    font-family: sans-serif;
   }
-
-  .role-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 12px;
-    border-radius: 100px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .role-vip      { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
-  .role-speaker  { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
-  .role-staff    { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-  .role-guest    { background: rgba(255,255,255,0.08); color: #a1a1aa; border: 1px solid rgba(255,255,255,0.15); }
-
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-    margin: 24px 0;
-  }
-
-  .btn-accept {
-    flex: 1;
-    padding: 14px;
-    background: white;
-    color: black;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+  .loader {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    gap: 16px;
   }
-  .btn-accept:hover { background: #e4e4e7; transform: translateY(-1px); }
-  .btn-accept:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-  .btn-decline {
-    flex: 1;
-    padding: 14px;
-    background: transparent;
-    color: #71717a;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-decline:hover { border-color: rgba(239,68,68,0.4); color: #f87171; }
-  .btn-decline:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* Skeleton loader */
-  .skeleton {
-    background: linear-gradient(90deg, #1a1a1a 25%, #242424 50%, #1a1a1a 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 8px;
-  }
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  /* Auth prompt */
-  .auth-prompt {
-    background: rgba(99,102,241,0.08);
-    border: 1px solid rgba(99,102,241,0.2);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-  }
-
-  /* Confirmation state */
-  .confirmation-icon {
-    width: 64px;
-    height: 64px;
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-top-color: white;
     border-radius: 50%;
-    display: flex;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .error-card {
+    display: none;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
+    gap: 12px;
+    text-align: center;
+    padding: 40px;
+    max-width: 360px;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
   }
-
-  .fade-in {
-    animation: fadeIn 0.4s ease;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .error-card h2 { color: white; margin: 0; font-size: 18px; }
+  .error-card p  { color: #71717a; margin: 0; font-size: 14px; line-height: 1.6; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+<body>
 
-  <!-- ENTRIQS LOGO -->
-  <a href="index.html" class="flex items-center gap-2 mb-8 opacity-60 hover:opacity-100 transition-opacity">
-    <div class="w-7 h-7 bg-white text-black rounded-lg flex items-center justify-center font-bold text-xs">EN</div>
-    <span class="text-white text-sm font-semibold tracking-wide">ENTRIQS</span>
-  </a>
-
-  <!-- LOADING STATE -->
-  <div id="loadingState" class="invite-card p-6 space-y-4" style="max-width:420px;width:100%">
-    <div class="skeleton w-full" style="height:220px;border-radius:12px"></div>
-    <div class="skeleton h-4 w-3/4"></div>
-    <div class="skeleton h-3 w-1/2"></div>
-    <div class="skeleton h-3 w-2/3"></div>
-    <div class="flex gap-3 mt-6">
-      <div class="skeleton flex-1" style="height:48px;border-radius:12px"></div>
-      <div class="skeleton flex-1" style="height:48px;border-radius:12px"></div>
-    </div>
+  <!-- Loading state -->
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <p style="color:#52525b;font-size:13px;margin:0;">Opening your invitation...</p>
   </div>
 
-  <!-- ERROR STATE -->
-  <div id="errorState" class="hidden invite-card p-8 text-center fade-in">
-    <div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-      <iconify-icon icon="lucide:x-circle" width="28" class="text-red-400"></iconify-icon>
-    </div>
-    <h2 class="text-white font-semibold text-lg mb-2">Invalid Invitation</h2>
-    <p class="text-zinc-500 text-sm">This invite link is invalid or has expired. Please contact the event organizer.</p>
+  <!-- Error state -->
+  <div class="error-card" id="errorCard">
+    <h2>Invalid Invitation</h2>
+    <p>This invite link is invalid or has expired. Please contact the event organizer.</p>
   </div>
-
-  <!-- MAIN INVITE CARD -->
-  <div id="inviteCard" class="hidden invite-card fade-in">
-
-    <!-- Hero Image -->
-    <div id="heroContainer"></div>
-
-    <!-- Card Body -->
-    <div class="p-6">
-
-      <!-- Organizer -->
-      <p id="organizerLine" class="text-zinc-500 text-xs uppercase tracking-widest mb-4"></p>
-
-      <!-- Event Name -->
-      <h1 id="eventName" class="text-white font-semibold text-2xl leading-tight mb-1" style="font-family:'Playfair Display',serif"></h1>
-
-      <div class="divider"></div>
-
-      <!-- Personal Section -->
-      <div class="mb-5">
-        <p class="text-zinc-500 text-xs uppercase tracking-widest mb-2">You're invited</p>
-        <div class="flex items-center gap-3">
-          <div id="attendeeAvatar" class="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-white font-semibold text-sm shrink-0"></div>
-          <div>
-            <p id="attendeeName" class="text-white font-medium text-base"></p>
-            <div id="roleBadgeContainer" class="mt-1"></div>
-          </div>
-        </div>
-        <p id="attendeeNote" class="hidden text-zinc-400 text-sm mt-3 italic border-l-2 border-white/10 pl-3"></p>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Event Details -->
-      <div class="space-y-3 mb-5">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/8 flex items-center justify-center shrink-0">
-            <iconify-icon icon="lucide:calendar" width="14" class="text-zinc-400"></iconify-icon>
-          </div>
-          <div>
-            <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Date & Time</p>
-            <p id="eventDate" class="text-white text-sm font-medium"></p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/8 flex items-center justify-center shrink-0">
-            <iconify-icon icon="lucide:map-pin" width="14" class="text-zinc-400"></iconify-icon>
-          </div>
-          <div>
-            <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Location</p>
-            <p id="eventLocation" class="text-white text-sm font-medium"></p>
-          </div>
-        </div>
-
-        <div id="seatRow" class="hidden flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/8 flex items-center justify-center shrink-0">
-            <iconify-icon icon="lucide:armchair" width="14" class="text-zinc-400"></iconify-icon>
-          </div>
-          <div>
-            <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Your Seat</p>
-            <p id="attendeeSeat" class="text-white text-sm font-medium"></p>
-          </div>
-        </div>
-
-        <div id="plusOneRow" class="hidden flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/8 flex items-center justify-center shrink-0">
-            <iconify-icon icon="lucide:user-plus" width="14" class="text-zinc-400"></iconify-icon>
-          </div>
-          <div>
-            <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Plus One</p>
-            <p class="text-white text-sm font-medium">You may bring a guest</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- QR Code (shown after accept) -->
-      <div id="qrSection" class="hidden mb-5">
-        <div class="divider"></div>
-        <p class="text-zinc-500 text-[10px] uppercase tracking-wider mb-3">Your Entry Code</p>
-        <div class="flex justify-center bg-white p-4 rounded-xl">
-          <div id="qrCode"></div>
-        </div>
-        <p class="text-zinc-600 text-xs text-center mt-2">Show this at the entrance</p>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- ACTION AREA -->
-      <div id="actionArea"></div>
-
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <p class="text-zinc-700 text-xs mt-8">Powered by Entriqs</p>
 
 <script>
 const API_URL = "https://entriqs-backend.onrender.com";
 
-// ── Helpers ───────────────────────────────────────────
-
-function getToken() {
-  return new URLSearchParams(window.location.search).get("token");
-}
-
-function getAuthToken() {
-  return localStorage.getItem("entriqs_token");
-}
-
-function isLoggedIn() {
-  return !!getAuthToken();
-}
-
-function getAuthHeaders() {
-  return {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${getAuthToken()}`
-  };
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return "TBC";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-GB", {
-    weekday: "long", day: "numeric",
-    month: "long", year: "numeric"
-  }) + " · " + d.toLocaleTimeString("en-GB", {
-    hour: "2-digit", minute: "2-digit"
-  });
-}
-
-function getInitials(name) {
-  return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
-}
-
-function getRoleBadgeClass(role) {
-  const map = { VIP: "role-vip", Speaker: "role-speaker", Staff: "role-staff" };
-  return map[role] || "role-guest";
-}
-
-// ── Render Functions ──────────────────────────────────
-
-function renderInviteCard(invite) {
-  // Hero image
-  const heroContainer = document.getElementById("heroContainer");
-  if (invite.image_url) {
-    heroContainer.innerHTML = `<img src="${invite.image_url}" class="hero-image" alt="${invite.event_name}">`;
-  } else {
-    heroContainer.innerHTML = `
-      <div class="hero-placeholder">
-        <iconify-icon icon="lucide:calendar-heart" width="48" class="text-white opacity-20"></iconify-icon>
-      </div>`;
-  }
-
-  // Organizer line
-  const organizer = invite.organization_name || invite.organizer_first || "The Organizer";
-  document.getElementById("organizerLine").textContent = `Invitation from ${organizer}`;
-
-  // Event name
-  document.getElementById("eventName").textContent = invite.event_name;
-
-  // Attendee
-  document.getElementById("attendeeAvatar").textContent = getInitials(invite.full_name);
-  document.getElementById("attendeeName").textContent   = invite.full_name;
-
-  // Role badge
-  if (invite.role) {
-    document.getElementById("roleBadgeContainer").innerHTML =
-      `<span class="role-badge ${getRoleBadgeClass(invite.role)}">${invite.role}</span>`;
-  }
-
-  // Note
-  if (invite.note) {
-    const noteEl = document.getElementById("attendeeNote");
-    noteEl.textContent = invite.note;
-    noteEl.classList.remove("hidden");
-  }
-
-  // Event details
-  document.getElementById("eventDate").textContent     = formatDate(invite.event_date);
-  document.getElementById("eventLocation").textContent = invite.location || "TBC";
-
-  // Seat
-  if (invite.seat) {
-    document.getElementById("attendeeSeat").textContent = invite.seat;
-    document.getElementById("seatRow").classList.remove("hidden");
-  }
-
-  // Plus one
-  if (invite.plus_one) {
-    document.getElementById("plusOneRow").classList.remove("hidden");
-  }
-
-  // Render action area based on current status
-  renderActionArea(invite);
-}
-
-function renderActionArea(invite) {
-  const area = document.getElementById("actionArea");
-
-  // Already responded
-  if (invite.status === "accepted") {
-    renderAcceptedState(invite.token);
-    return;
-  }
-  if (invite.status === "declined") {
-    area.innerHTML = `
-      <div class="text-center py-2">
-        <p class="text-zinc-500 text-sm">You have declined this invitation.</p>
-        <button onclick="undoDecline()" class="text-xs text-zinc-400 hover:text-white underline mt-2 transition-colors">
-          Changed your mind? Accept instead
-        </button>
-      </div>`;
-    return;
-  }
-
-  // Pending — show buttons
-  if (!isLoggedIn()) {
-    // Not logged in — show auth prompt
-    area.innerHTML = `
-      <div class="auth-prompt mb-4">
-        <iconify-icon icon="lucide:lock" width="20" class="text-indigo-400 mb-2"></iconify-icon>
-        <p class="text-white text-sm font-medium mb-1">Sign in to confirm your attendance</p>
-        <p class="text-zinc-500 text-xs mb-3">You need an Entriqs account to accept or decline this invitation</p>
-        <div class="flex gap-2">
-          <a href="login.html?redirect=${encodeURIComponent(window.location.href)}"
-            class="flex-1 py-2 bg-white text-black text-xs font-semibold rounded-lg text-center hover:bg-zinc-200 transition-colors">
-            Sign In
-          </a>
-          <a href="signup.html?redirect=${encodeURIComponent(window.location.href)}"
-            class="flex-1 py-2 border border-white/10 text-zinc-300 text-xs font-semibold rounded-lg text-center hover:bg-zinc-900 transition-colors">
-            Create Account
-          </a>
-        </div>
-      </div>`;
-    return;
-  }
-
-  // Logged in — show accept/decline
-  area.innerHTML = `
-    <div class="flex gap-3">
-      <button id="btnAccept" onclick="respondToInvite('accepted')" class="btn-accept">
-        <iconify-icon icon="lucide:check" width="16"></iconify-icon>
-        Accept
-      </button>
-      <button id="btnDecline" onclick="respondToInvite('declined')" class="btn-decline">
-        <iconify-icon icon="lucide:x" width="16"></iconify-icon>
-        Decline
-      </button>
-    </div>`;
-}
-
-function renderAcceptedState(token) {
-  // Show QR code
-  const qrSection = document.getElementById("qrSection");
-  qrSection.classList.remove("hidden");
-  document.getElementById("qrCode").innerHTML = "";
-  new QRCode(document.getElementById("qrCode"), {
-    text: `${window.location.origin}/invite.html?token=${token}`,
-    width: 160, height: 160,
-    colorDark: "#000000", colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
-  });
-
-  // Show confirmation in action area
-  document.getElementById("actionArea").innerHTML = `
-    <div class="text-center fade-in">
-      <div class="confirmation-icon bg-emerald-500/10">
-        <iconify-icon icon="lucide:check-circle" width="32" class="text-emerald-400"></iconify-icon>
-      </div>
-      <p class="text-white font-semibold mb-1">You're going!</p>
-      <p class="text-zinc-500 text-sm">Your attendance has been confirmed. Show the QR code above at the entrance.</p>
-    </div>`;
-}
-
-// ── API Calls ─────────────────────────────────────────
-
-async function respondToInvite(response) {
-  const token = getToken();
-  if (!token) return;
-
-  // Disable buttons
-  const btnAccept  = document.getElementById("btnAccept");
-  const btnDecline = document.getElementById("btnDecline");
-  if (btnAccept)  btnAccept.disabled  = true;
-  if (btnDecline) btnDecline.disabled = true;
-
-  try {
-    const res = await fetch(`${API_URL}/api/invite/${token}/respond`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ response })
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to respond");
-
-    if (response === "accepted") {
-      renderAcceptedState(token);
-    } else {
-      document.getElementById("actionArea").innerHTML = `
-        <div class="text-center fade-in">
-          <div class="confirmation-icon bg-zinc-800">
-            <iconify-icon icon="lucide:x-circle" width="32" class="text-zinc-400"></iconify-icon>
-          </div>
-          <p class="text-white font-semibold mb-1">Invitation Declined</p>
-          <p class="text-zinc-500 text-sm mb-3">Sorry you can't make it.</p>
-          <button onclick="undoDecline()" class="text-xs text-zinc-400 hover:text-white underline transition-colors">
-            Changed your mind? Accept instead
-          </button>
-        </div>`;
-    }
-  } catch (err) {
-    console.error("Respond error:", err);
-    if (btnAccept)  btnAccept.disabled  = false;
-    if (btnDecline) btnDecline.disabled = false;
-    alert("Something went wrong. Please try again.");
-  }
-}
-
-async function undoDecline() {
-  await respondToInvite("accepted");
-}
-
-// ── Init ──────────────────────────────────────────────
-
 async function init() {
-  const token = getToken();
+  const token = new URLSearchParams(window.location.search).get("token");
 
+  // No token in URL
   if (!token) {
-    document.getElementById("loadingState").classList.add("hidden");
-    document.getElementById("errorState").classList.remove("hidden");
+    showError();
     return;
   }
 
@@ -506,16 +77,29 @@ async function init() {
     const res  = await fetch(`${API_URL}/api/invite/${token}`);
     const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error);
+    if (!res.ok) {
+      showError();
+      return;
+    }
 
-    document.getElementById("loadingState").classList.add("hidden");
-    document.getElementById("inviteCard").classList.remove("hidden");
-    renderInviteCard(data.invite);
+    const template = data.invite.invite_template || "default";
+
+    // Redirect to the right template file
+    if (template === "wedding") {
+      window.location.href = `invite-wedding.html?token=${token}`;
+    } else {
+      window.location.href = `invite-default.html?token=${token}`;
+    }
 
   } catch (err) {
-    document.getElementById("loadingState").classList.add("hidden");
-    document.getElementById("errorState").classList.remove("hidden");
+    console.error("Router error:", err);
+    showError();
   }
+}
+
+function showError() {
+  document.getElementById("loader").style.display    = "none";
+  document.getElementById("errorCard").style.display = "flex";
 }
 
 document.addEventListener("DOMContentLoaded", init);

@@ -72,6 +72,7 @@ function normalizeEventFromAPI(e) {
     eventType:             e.event_type,
     eventSubtype:          e.event_subtype,
     eventFormat:           e.event_format,
+    inviteTemplate:        e.invite_template || "default",
     imageUrl:              e.image_url,
     tickets:               e.tickets || [],
     status:                e.status,
@@ -864,6 +865,7 @@ async function handleSaveDraft(form) {
 function openCreateEventForm() {
   closeEditModal();
   currentEditingEventId = null;
+  currentInviteTemplate = "default";
 
   // Reset all fields
   document.getElementById("ol_eventName").value = "";
@@ -987,6 +989,7 @@ function editEvent(eventId) {
 
 function cancelEdit() {
   currentEditingEventId = null;
+  currentInviteTemplate = "default";
   document.getElementById("createEventOverlay").classList.add("hidden");
   document.body.style.overflow = "";
   removeImage();
@@ -1920,6 +1923,7 @@ function zoomCanvas(scale) {
 let currentStep = 1;
 let currentEventSubtype = "public"; // public | private_ticketed | invite_only
 let inviteAttendees = []; // for invite_only events
+let currentInviteTemplate = "default"; // default 
 
 function goToStep(step) {
   currentStep = step;
@@ -2205,17 +2209,18 @@ function collectOverlayFormData(status = "published") {
   const eventType = currentEventSubtype === "public" ? "public" : "private";
 
   return {
-    name:        document.getElementById("ol_eventName")?.value.trim(),
-    date:        date && time ? `${date}T${time}` : date || "",
-    location:    document.getElementById("ol_location")?.value.trim(),
-    category:    document.getElementById("ol_category")?.value.trim(),
-    description: document.getElementById("ol_description")?.value.trim(),
+    name:           document.getElementById("ol_eventName")?.value.trim(),
+    date:           date && time ? `${date}T${time}` : date || "",
+    location:       document.getElementById("ol_location")?.value.trim(),
+    category:       document.getElementById("ol_category")?.value.trim(),
+    description:    document.getElementById("ol_description")?.value.trim(),
     eventType,
-    eventSubtype: currentEventSubtype,
-    eventFormat: document.getElementById("ol_eventFormat")?.value,
-    imageUrl:    selectedEventImage,
+    eventSubtype:   currentEventSubtype,
+    eventFormat:    document.getElementById("ol_eventFormat")?.value,
+    imageUrl:       selectedEventImage,
     tickets,
-    status
+    status,
+    inviteTemplate: currentInviteTemplate
   };
 }
 
