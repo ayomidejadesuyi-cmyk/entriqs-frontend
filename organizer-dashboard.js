@@ -867,12 +867,12 @@ function openCreateEventForm() {
   currentEditingEventId = null;
   currentEventSubtype = "public";
   currentInviteTemplate = "default";
-// Reset template card selection
-document.querySelectorAll(".invite-template-card").forEach((c, i) => {
-  c.classList.toggle("selected", i === 0);
-  c.classList.toggle("border-white", i === 0);
-  c.classList.toggle("border-white/10", i !== 0);
-});
+  // Reset template card selection
+  document.querySelectorAll(".invite-template-card").forEach((c, i) => {
+    c.classList.toggle("selected", i === 0);
+    c.classList.toggle("border-white", i === 0);
+    c.classList.toggle("border-white/10", i !== 0);
+  });
 
   // Reset all fields
   document.getElementById("ol_eventName").value = "";
