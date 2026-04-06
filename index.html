@@ -38,6 +38,107 @@
         .social-login button { width: 100%; margin-top: 10px; padding: 10px; background: #f5f5f5; border: 1px solid #ddd; cursor: pointer; }
         .organizer-check { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; color: #000; }
         .organizer-check input[type="checkbox"] { margin: 0; width: 16px; height: 16px; }
+
+        /* ── EN Logo Loader ── */
+        @keyframes spin-arc {
+          to { transform: rotate(360deg); }
+        }
+        .en-loader {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+        }
+        .en-loader-ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          border: 2px solid transparent;
+          border-top-color: white;
+          border-right-color: rgba(255,255,255,0.3);
+          animation: spin-arc 0.8s linear infinite;
+        }
+        .en-loader-logo {
+          width: 24px;
+          height: 24px;
+          background: white;
+          color: black;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 9px;
+          letter-spacing: -0.5px;
+          z-index: 1;
+        }
+
+        /* ── Mobile event strip ── */
+        .mobile-event-strip {
+          display: flex;
+          gap: 12px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          padding-bottom: 4px;
+        }
+        .mobile-event-strip::-webkit-scrollbar { display: none; }
+
+        .mobile-event-card {
+          flex-shrink: 0;
+          width: 200px;
+          background: rgba(39,39,42,0.4);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 16px;
+          overflow: hidden;
+          cursor: pointer;
+          transition: border-color 0.2s, transform 0.2s;
+        }
+        .mobile-event-card:hover {
+          border-color: rgba(255,255,255,0.2);
+          transform: translateY(-2px);
+        }
+        .mobile-event-card-image {
+          height: 110px;
+          width: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .mobile-event-card-image-placeholder {
+          height: 110px;
+          background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .mobile-event-card-body {
+          padding: 10px 12px 12px;
+        }
+
+        /* ── Button loader state ── */
+        .btn-loading {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          pointer-events: none;
+          opacity: 0.85;
+        }
+        .btn-spinner {
+          width: 14px;
+          height: 14px;
+          border: 2px solid rgba(0,0,0,0.2);
+          border-top-color: black;
+          border-radius: 50%;
+          animation: spin-arc 0.7s linear infinite;
+          flex-shrink: 0;
+        }
+        .btn-spinner-white {
+          border: 2px solid rgba(255,255,255,0.2);
+          border-top-color: white;
+        }
     </style>
 <link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style><link id="all-fonts-link-font-newsreader" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&amp;display=swap"><style id="all-fonts-style-font-newsreader">.font-newsreader { font-family: 'Newsreader', serif !important; }</style><link id="all-fonts-link-font-google-sans-flex" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-google-sans-flex">.font-google-sans-flex { font-family: 'Google Sans Flex', sans-serif !important; }</style><link id="all-fonts-link-font-oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-oswald">.font-oswald { font-family: 'Oswald', sans-serif !important; }</style><link id="all-fonts-link-font-dm-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-dm-sans">.font-dm-sans { font-family: 'DM Sans', sans-serif !important; }</style></head>
 <body class="min-h-screen flex flex-col font-sans text-sm selection:bg-white selection:text-black overflow-x-hidden">
@@ -49,11 +150,12 @@
                 <span class="font-semibold tracking-tight text-lg hidden sm:block">ENTRIQS</span>
             </a>
             <div class="flex items-center gap-6 text-secondary">
-                <a href="events.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">Explore</a>
-                <a href="#" id="loginBtn" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">Login</a>
-                <a href="aboutentriqs.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">About Us</a>
-                <a href="attendee.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">My Tickets</a>
-            </div>
+              <a href="events.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">Explore</a>
+              <a href="#" id="loginBtn" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">Login</a>
+              <a href="aboutentriqs.html" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">About Us</a>
+              <a href="attendee.html" id="attendeeLink" class="hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">My Tickets</a>
+              <a href="organizer-dashboard.html" id="organizerLink" class="hidden hover:text-primary transition-colors text-xs font-medium uppercase tracking-wider">Dashboard</a>
+          </div>
             <div class="flex items-center gap-4">
             <div class="relative">
                 <button
@@ -79,12 +181,12 @@
                 </div>
 
                 <!-- Links -->
-                <a href="organizer-dashboard.html"
+                <a href="organizer-dashboard.html" id="dropdownOrganizerLink"
                     class="block px-4 py-2 hover:bg-white/5">
                     Dashboard
                 </a>
 
-                <a href="attendee.html"
+                <a href="attendee.html" id="dropdownAttendeeLink"
                     class="block px-4 py-2 hover:bg-white/5">
                     My Tickets
                 </a>
@@ -124,6 +226,35 @@
                 <p class="text-zinc-400 text-lg max-w-md leading-relaxed">
                     Access exclusive private gatherings and massive public festivals. Your gateway to the world's most immersive experiences.
                 </p>
+                <!-- Mobile event strip (shows on mobile only) -->
+                <div class="block lg:hidden">
+                  <p class="text-[10px] uppercase tracking-widest text-zinc-500 mb-3 font-medium">Upcoming Events</p>
+                  <div class="mobile-event-strip" id="mobileEventStrip">
+                    <!-- Skeleton cards while loading -->
+                    <div class="mobile-event-card animate-pulse">
+                      <div class="mobile-event-card-image-placeholder bg-zinc-800"></div>
+                      <div class="mobile-event-card-body space-y-2">
+                        <div class="h-3 bg-zinc-700 rounded w-3/4"></div>
+                        <div class="h-2 bg-zinc-800 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                    <div class="mobile-event-card animate-pulse">
+                      <div class="mobile-event-card-image-placeholder bg-zinc-800"></div>
+                      <div class="mobile-event-card-body space-y-2">
+                        <div class="h-3 bg-zinc-700 rounded w-3/4"></div>
+                        <div class="h-2 bg-zinc-800 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                    <div class="mobile-event-card animate-pulse">
+                      <div class="mobile-event-card-image-placeholder bg-zinc-800"></div>
+                      <div class="mobile-event-card-body space-y-2">
+                        <div class="h-3 bg-zinc-700 rounded w-3/4"></div>
+                        <div class="h-2 bg-zinc-800 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="flex gap-4 pt-4">
                     <a href="events.html" class="h-12 px-8 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
                         Browse Events
@@ -651,8 +782,9 @@ loginSubmit.addEventListener("click", async () => {
       return;
     }
 
-    loginSubmit.textContent = "Logging in...";
+    const loginOriginal = loginSubmit.innerHTML;
     loginSubmit.disabled = true;
+    loginSubmit.innerHTML = `<span class="btn-loading"><span class="btn-spinner"></span>Logging in...</span>`;
 
     try {
       const res  = await fetch("https://entriqs-backend.onrender.com/api/auth/login", {
@@ -694,8 +826,8 @@ loginSubmit.addEventListener("click", async () => {
       console.error("Login error", err);
       alert("Could not connect to server. Please try again.");
     } finally {
-      loginSubmit.textContent = "Login";
       loginSubmit.disabled = false;
+      loginSubmit.innerHTML = loginOriginal;
     }
 });
 
@@ -760,10 +892,10 @@ document.getElementById("signupSubmitFinal").addEventListener("click", async () 
   }
 
   const submitBtn = document.getElementById("signupSubmitFinal");
-  submitBtn.textContent = "Creating account...";
+  const signupOriginal = submitBtn.innerHTML;
   submitBtn.disabled = true;
-
-  const nameParts = signupDraft.fullName.split(" ");
+  submitBtn.innerHTML = `<span class="btn-loading"><span class="btn-spinner"></span>Creating account...</span>`;
+    const nameParts = signupDraft.fullName.split(" ");
 
   try {
     const res = await fetch("https://entriqs-backend.onrender.com/api/auth/register", {
@@ -817,8 +949,8 @@ document.getElementById("signupSubmitFinal").addEventListener("click", async () 
     console.error("Signup error", err);
     alert("Could not connect to server. Please try again.");
   } finally {
-    submitBtn.textContent = "Create Account";
     submitBtn.disabled = false;
+    submitBtn.innerHTML = signupOriginal;
   }
 });
 
@@ -836,122 +968,144 @@ if (backToLoginFromSignup) {
 
 </script>
 <script>
-/* =========================
-   HOMEPAGE EVENTS ENGINE
-   (PUBLIC EVENTS ONLY)
-========================= */
+const HOME_API_URL = "https://entriqs-backend.onrender.com";
+let homeEvents = [];
 
-function getAllEvents() {
+/* ── Fetch real events from API ── */
+async function fetchHomeEvents() {
   try {
-    const raw = localStorage.getItem("entriqs_events");
-    if (!raw) return [];
-
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed;
-    if (typeof parsed === "object") return Object.values(parsed);
-
-    return [];
-  } catch {
-    return [];
+    const res  = await fetch(`${HOME_API_URL}/api/events`);
+    const data = await res.json();
+    homeEvents = (data.events || []).filter(e =>
+      e.status === "published" &&
+      e.event_type !== "private"
+    );
+    renderHomepageEvents();
+    renderMobileEventStrip();
+  } catch (err) {
+    console.error("Failed to fetch home events", err);
+    // Keep hardcoded fallback on desktop, hide skeleton on mobile
+    renderMobileEventStrip(true);
   }
 }
 
-function normalizeEvent(event) {
-  return {
-    title: event.name || event.title || "Untitled Event",
-    image: event.imageUrl || event.image || "",
-    startDate: event.date || event.startDate,
-    location: event.location || "TBA",
-    visibility: event.eventType === "private" ? "Private" : "Public"
-  };
-}
-
-
-
-
- // PUBLIC EVENTS ONLY + SHUFFLE
 function shuffleArray(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+  return [...arr].sort(() => Math.random() - 0.5);
 }
 
-function getPublicUpcomingEvents() {
-  const now = Date.now();
-
-  return getAllEvents()
-    .map(normalizeEvent)
-    .filter(e =>
-      e.visibility === "Public" &&
-      e.startDate &&
-      new Date(e.startDate).getTime() > now
-    );
-}
-
-
-
+/* ── Desktop floating cards ── */
 function renderHomepageEvents() {
   const slots = document.querySelectorAll("[data-home-event]");
-  if (!slots.length) return;
+  if (!slots.length || !homeEvents.length) return;
 
-  let events = getPublicUpcomingEvents();
-
-  if (events.length === 0) return; // fallback = keep hardcoded
-
-  events = shuffleArray(events).slice(0, slots.length);
+  const shuffled = shuffleArray(homeEvents).slice(0, slots.length);
 
   slots.forEach((slot, index) => {
-    const event = events[index];
+    const event = shuffled[index];
     if (!event) return;
 
-    const img = slot.querySelector("img");
+    const img   = slot.querySelector("img");
     const title = slot.querySelector("h3");
-    const meta = slot.querySelector("p");
+    const meta  = slot.querySelector("p");
+    const badge = slot.querySelector(".absolute");
 
-    if (img && event.image) img.src = event.image;
-    if (title) title.textContent = event.title;
-
+    if (img && event.image_url) {
+      img.src = event.image_url;
+    }
+    if (title) {
+      title.textContent = event.name || "Untitled Event";
+    }
     if (meta) {
-      meta.innerHTML = `
-        <iconify-icon icon="lucide:calendar" width="12"></iconify-icon>
-        ${new Date(event.startDate).toLocaleDateString()}
-      `;
+      const date = event.event_date
+        ? new Date(event.event_date).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+        : "TBA";
+      meta.innerHTML = `<iconify-icon icon="lucide:calendar" width="12"></iconify-icon> ${date}`;
+    }
+    if (badge && event.event_type === "private") {
+      badge.textContent = "PRIVATE";
     }
   });
 }
 
+/* ── Mobile horizontal strip ── */
+function renderMobileEventStrip(empty = false) {
+  const strip = document.getElementById("mobileEventStrip");
+  if (!strip) return;
 
+  if (empty || !homeEvents.length) {
+    strip.innerHTML = `
+      <div class="text-xs text-zinc-600 py-4 px-2">No events available</div>`;
+    return;
+  }
+
+  const events = shuffleArray(homeEvents).slice(0, 3);
+
+  strip.innerHTML = events.map(event => {
+    const date = event.event_date
+      ? new Date(event.event_date).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+      : "TBA";
+    const location = event.location || "TBA";
+    const imagePart = event.image_url
+      ? `<img src="${event.image_url}" class="mobile-event-card-image" alt="${event.name}">`
+      : `<div class="mobile-event-card-image-placeholder">
+           <iconify-icon icon="lucide:calendar" width="24" class="text-zinc-700"></iconify-icon>
+         </div>`;
+
+    return `
+      <div class="mobile-event-card" onclick="window.location.href='event-detail.html?id=${event.id}'">
+        ${imagePart}
+        <div class="mobile-event-card-body">
+          <h4 class="text-xs font-semibold text-white truncate leading-snug mb-1">${event.name}</h4>
+          <p class="text-[10px] text-zinc-500 flex items-center gap-1">
+            <iconify-icon icon="lucide:calendar" width="9"></iconify-icon>
+            ${date}
+          </p>
+          <p class="text-[10px] text-zinc-600 flex items-center gap-1 mt-0.5 truncate">
+            <iconify-icon icon="lucide:map-pin" width="9"></iconify-icon>
+            ${location}
+          </p>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ── Login button loader ── */
+function setButtonLoading(btn, loading, originalHTML) {
+  if (loading) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span class="btn-loading">
+        <span class="btn-spinner"></span>
+        Loading...
+      </span>`;
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+}
+
+/* ── Init ── */
 document.addEventListener("DOMContentLoaded", () => {
-  renderHomepageEvents();
-
+  fetchHomeEvents();
   // Rotate every 20 minutes
-  setInterval(renderHomepageEvents, 20 * 60 * 1000);
-});
+  setInterval(() => {
+    fetchHomeEvents();
+  }, 20 * 60 * 1000);
 
-
-document.addEventListener("DOMContentLoaded", () => {
+  // Create event button handler
   const createEventBtn = document.getElementById("openLogin");
-  if (!createEventBtn) return;
-
-  createEventBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    // 1️⃣ Not logged in → open login modal
-    if (!userSession.isAuthenticated || !userSession.user) {
-      const loginModal = document.getElementById("loginModal");
-      if (loginModal) {
-        loginModal.style.display = "flex";
+  if (createEventBtn) {
+    createEventBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (!userSession.isAuthenticated || !userSession.user) {
+        document.getElementById("loginModal").style.display = "flex";
+        return;
       }
-      return;
-    }
-
-    // 2️⃣ Organizer → go to dashboard with create modal open
-    if (userSession.user.role === "organizer") {
-      window.location.href = "organizer-dashboard.html#create-event";
-      return;
-    }
-
-    // 3️⃣ Attendee → should never happen (button hidden)
-  });
+      if (userSession.user.role === "organizer") {
+        window.location.href = "organizer-dashboard.html#create-event";
+      }
+    });
+  }
 });
-
 </script>
 </html>

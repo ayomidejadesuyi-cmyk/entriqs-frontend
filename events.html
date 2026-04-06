@@ -352,17 +352,43 @@ const API_URL = "https://entriqs-backend.onrender.com";
 
 let cachedEvents = [];
 
+function renderSkeletonCards() {
+  const grid = document.getElementById("eventsGrid");
+  if (!grid) return;
+  grid.innerHTML = Array(6).fill(0).map(() => `
+    <div class="animate-pulse" style="border-radius:16px;overflow:hidden;background:#111;border:1px solid rgba(255,255,255,0.06);">
+      <div style="height:220px;background:#1a1a1a;"></div>
+      <div style="padding:14px 16px 16px;">
+        <div style="height:12px;background:#222;border-radius:6px;width:60%;margin-bottom:10px;"></div>
+        <div style="height:10px;background:#1a1a1a;border-radius:6px;width:80%;margin-bottom:8px;"></div>
+        <div style="height:10px;background:#1a1a1a;border-radius:6px;width:50%;margin-bottom:16px;"></div>
+        <div style="height:36px;background:#1a1a1a;border-radius:10px;"></div>
+      </div>
+    </div>`).join("");
+}
+
 async function loadEventsFromAPI() {
+  renderSkeletonCards();
+  const label = document.getElementById("eventCountLabel");
+  if (label) label.textContent = "Loading events…";
+
   try {
     const res  = await fetch(`${API_URL}/api/events`);
     const data = await res.json();
     cachedEvents = data.events || [];
-
-    console.log("First raw event from API:", JSON.stringify(cachedEvents[0], null, 2));
-
     renderWithFiltersAndSearch();
   } catch (err) {
     console.error("Failed to load events", err);
+    const grid = document.getElementById("eventsGrid");
+    if (grid) grid.innerHTML = `
+      <div class="col-span-full text-center py-20">
+        <iconify-icon icon="lucide:wifi-off" width="40" class="text-zinc-700 mb-4 block mx-auto"></iconify-icon>
+        <p class="text-zinc-500 text-sm">Could not load events. Please refresh.</p>
+        <button onclick="loadEventsFromAPI()" class="mt-4 px-4 py-2 bg-white text-black text-xs font-semibold rounded-lg hover:bg-zinc-200 transition-colors">
+          Try Again
+        </button>
+      </div>`;
+    if (label) label.textContent = "Failed to load events";
   }
 }
 
